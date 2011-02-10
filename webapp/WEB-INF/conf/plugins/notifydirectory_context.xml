@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+ 	 <bean id="taskNotifyDirectoryConfigDAO"  class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigDAO"/>
+ 	 <bean id="taskNotifyDirectoryResourceKeyDAO"  class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyDAO"/>
+ 	 
+ 	 <bean id="workflow-notifydirectory.taskNotifyDirectory" class="fr.paris.lutece.plugins.workflow.business.task.TaskType" >
+ 	 		<property name="key" value="taskNotifyDirectory" />
+     		 <property name="titleI18nKey" value="module.workflow.notifydirectory.task_notify_directory_title" />
+    		 <property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectory"/>
+   	  </bean>
+   	  
+</beans>
+ 	
