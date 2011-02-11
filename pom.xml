@@ -17,7 +17,7 @@
 		<repository>
 			<id>lutece</id>
 			<name>luteceRepository</name>
-			<url>http://dev.lutece.paris.fr/maven_repository</url>
+			<url>http://dev.lutece.paris.fr/maven_repository/module-workflow-notifydirectory</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>
@@ -43,8 +43,8 @@
         <jiraComponentId>10250</jiraComponentId>
     </properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/directory-form-workflow</url>
+        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</connection>
+        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</developerConnection>
+        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</url>
     </scm>
 </project>
