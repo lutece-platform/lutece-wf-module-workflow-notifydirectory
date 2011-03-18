@@ -33,6 +33,17 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
@@ -69,18 +80,6 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
-
-import java.sql.Timestamp;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -569,7 +568,11 @@ public class TaskNotifyDirectory extends Task
                 for ( RecordField recordField : listRecordField )
                 {
                 	String value = recordField.getValue(  );
-                    if ( recordField.getField(  ) != null && 
+                	if ( isEntryTypeRefused( recordField.getEntry(  ) ) )
+                	{
+                		continue;
+                	}
+                	else if ( recordField.getField(  ) != null && 
                     		!( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation ) )
                     {
                         recordFieldFilter.setIdEntry( recordField.getEntry(  ).getIdEntry(  ) );
@@ -735,5 +738,32 @@ public class TaskNotifyDirectory extends Task
     public boolean isTaskForActionAutomatic(  )
     {
         return true;
+    }
+
+    /**
+     * Check if the entry is refused (values set in the workflow-notifydirectory.properties)
+     * @param entry the entry
+     * @return true if it is refused, false otherwise
+     */
+    private boolean isEntryTypeRefused( IEntry entry )
+    {
+    	boolean bIsRefused = false;
+    	
+        if ( entry != null )
+        {
+        	String strRefuseEntryType = AppPropertiesService.getProperty( PROPERTY_REFUSE_DIRECTORY_TYPE );
+            String[] strTabRefuseEntryType = strRefuseEntryType.split( COMMA );
+            
+        	for ( int i = 0; i < strTabRefuseEntryType.length; i++ )
+            {
+            	if ( entry.getEntryType(  ).getIdType(  ) == Integer.parseInt( strTabRefuseEntryType[i] ) )
+                {
+                	bIsRefused = true;
+                	break;
+                }
+            }
+        }
+        
+        return bIsRefused;
     }
 }
