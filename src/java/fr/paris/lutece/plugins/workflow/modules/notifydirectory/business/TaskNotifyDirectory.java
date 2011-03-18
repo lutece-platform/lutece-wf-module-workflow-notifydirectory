@@ -40,6 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +75,6 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
@@ -330,7 +330,7 @@ public class TaskNotifyDirectory extends Task
      */
     public String getDisplayConfigForm( HttpServletRequest request, Plugin plugin, Locale locale )
     {
-        HashMap model = new HashMap(  );
+        Map<String, Object> model = new HashMap<String, Object>(  );
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         String strAcceptEntryType = AppPropertiesService.getProperty( PROPERTY_ACCEPT_DIRECTORY_TYPE );
@@ -544,119 +544,112 @@ public class TaskNotifyDirectory extends Task
                     }
                 }
             }
+            
+            String strSenderEmail = MailService.getNoReplyEmail(  );
 
-            try
+            Map<String, String> model = new HashMap<String, String>(  );
+            model.put( MARK_MESSAGE, config.getMessage(  ) );
+
+            //Directory directory = DirectoryHome.findByPrimaryKey( config.getIdDirectory(  ), pluginDirectory );
+            if ( directory != null )
             {
-                String strSenderEmail = MailService.getNoReplyEmail(  );
-
-                HashMap<String, String> model = new HashMap<String, String>(  );
-                model.put( MARK_MESSAGE, config.getMessage(  ) );
-
-                //Directory directory = DirectoryHome.findByPrimaryKey( config.getIdDirectory(  ), pluginDirectory );
-                if ( directory != null )
-                {
-                    model.put( MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
-                    model.put( MARK_DIRECTORY_DESCRIPTION, directory.getDescription(  ) );
-                }
-
-                RecordFieldFilter recordFieldFilter = new RecordFieldFilter(  );
-                recordFieldFilter.setIdRecord( record.getIdRecord(  ) );
-
-                List<RecordField> listRecordField = RecordFieldHome.getRecordFieldList( recordFieldFilter,
-                        pluginDirectory );
-
-                for ( RecordField recordField : listRecordField )
-                {
-                	String value = recordField.getValue(  );
-                	if ( isEntryTypeRefused( recordField.getEntry(  ) ) )
-                	{
-                		continue;
-                	}
-                	else if ( recordField.getField(  ) != null && 
-                    		!( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation ) )
-                    {
-                        recordFieldFilter.setIdEntry( recordField.getEntry(  ).getIdEntry(  ) );
-                        listRecordField = RecordFieldHome.getRecordFieldList( recordFieldFilter, pluginDirectory );
-
-                        if ( ( listRecordField.get( 0 ) != null ) && ( listRecordField.get( 0 ).getField(  ) != null ) &&
-                                ( listRecordField.get( 0 ).getField(  ).getTitle(  ) != null ) )
-                        {
-                            value = listRecordField.get( 0 ).getField(  ).getTitle(  );
-                        }
-                    }
-                    else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation && 
-                    		!recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
-                    {
-                    	continue;
-                    }
-
-                    recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ),
-                            pluginDirectory ) );
-                    model.put( MARK_POSITION + String.valueOf( recordField.getEntry(  ).getPosition(  ) ), value );
-                }
-
-                if ( ( record.getDirectory(  ).getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) &&
-                        WorkflowService.getInstance(  ).isAvailable(  ) )
-                {
-                    State state = WorkflowService.getInstance(  )
-                                                 .getState( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
-                            record.getDirectory(  ).getIdWorkflow(  ), null );
-                    model.put( MARK_STATUS, state.getName(  ) );
-                }
-
-                //Generate key
-                String link = DirectoryUtils.EMPTY_STRING;
-                String linkHtml = DirectoryUtils.EMPTY_STRING;
-
-                if ( config.isEmailValidation(  ) )
-                {
-                    ResourceKey resourceKey = new ResourceKey(  );
-                    UUID key = java.util.UUID.randomUUID(  );
-                    resourceKey.setKey( key.toString(  ) );
-                    resourceKey.setIdResource( record.getIdRecord(  ) );
-                    resourceKey.setResourceType( resourceHistory.getResourceType(  ) );
-                    resourceKey.setIdTask( this.getId(  ) );
-
-                    Calendar calendar = GregorianCalendar.getInstance(  );
-                    calendar.add( Calendar.DAY_OF_MONTH, config.getPeriodValidity(  ) );
-                    resourceKey.setDateExpiry( new Timestamp( calendar.getTimeInMillis(  ) ) );
-                    ResourceKeyHome.create( resourceKey, pluginDirectory );
-                    link = AppPropertiesService.getProperty( PROPERTY_URL ) + "/" + AppPathService.getPortalUrl(  ) +
-                        "?page=workflow&key=" + key.toString(  );
-                    linkHtml = HTML_LINK_OPEN_1 + link + HTML_LINK_OPEN_2 + config.getLabelLink(  ) + HTML_LINK_CLOSE;
-
-                    HashMap modelTmp = new HashMap(  );
-                    modelTmp.put( MARK_LINK, link );
-                    linkHtml = AppTemplateService.getTemplateFromStringFtl( linkHtml, locale, modelTmp ).getHtml(  );
-                }
-
-                model.put( MARK_LINK, linkHtml );
-
-                HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                            TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
-
-                if ( config.isNotifyByEmail(  ) && ( strEmail != null ) &&
-                        !DirectoryUtils.EMPTY_STRING.equals( strEmail ) )
-                {
-                    // Build the mail message
-                    MailService.sendMailHtml( strEmail, config.getSenderName(  ), strSenderEmail,
-                        AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
-                        t.getHtml(  ) );
-                }
-
-                if ( config.isNotifyBySms(  ) && ( strSms != null ) && !DirectoryUtils.EMPTY_STRING.equals( strSms ) )
-                {
-                    // Build the sms message
-                    HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                                TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
-                    MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail,
-                        AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
-                        tSMS.getHtml(  ) );
-                }
+                model.put( MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
+                model.put( MARK_DIRECTORY_DESCRIPTION, directory.getDescription(  ) );
             }
-            catch ( Exception e )
+
+            RecordFieldFilter recordFieldFilter = new RecordFieldFilter(  );
+            recordFieldFilter.setIdRecord( record.getIdRecord(  ) );
+
+            List<RecordField> listRecordField = RecordFieldHome.getRecordFieldList( recordFieldFilter,
+                    pluginDirectory );
+
+            for ( RecordField recordField : listRecordField )
             {
-                AppLogService.error( "Error during notification: " + e.getMessage(  ) );
+            	String value = recordField.getValue(  );
+            	if ( isEntryTypeRefused( recordField.getEntry(  ) ) )
+            	{
+            		continue;
+            	}
+            	else if ( recordField.getField(  ) != null && 
+                		!( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation ) )
+                {
+                    recordFieldFilter.setIdEntry( recordField.getEntry(  ).getIdEntry(  ) );
+                    listRecordField = RecordFieldHome.getRecordFieldList( recordFieldFilter, pluginDirectory );
+
+                    if ( ( listRecordField.get( 0 ) != null ) && ( listRecordField.get( 0 ).getField(  ) != null ) &&
+                            ( listRecordField.get( 0 ).getField(  ).getTitle(  ) != null ) )
+                    {
+                        value = listRecordField.get( 0 ).getField(  ).getTitle(  );
+                    }
+                }
+                else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation && 
+                		!recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
+                {
+                	continue;
+                }
+
+                recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ),
+                        pluginDirectory ) );
+                model.put( MARK_POSITION + String.valueOf( recordField.getEntry(  ).getPosition(  ) ), value );
+            }
+
+            if ( ( record.getDirectory(  ).getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) &&
+                    WorkflowService.getInstance(  ).isAvailable(  ) )
+            {
+                State state = WorkflowService.getInstance(  )
+                                             .getState( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
+                        record.getDirectory(  ).getIdWorkflow(  ), null );
+                model.put( MARK_STATUS, state.getName(  ) );
+            }
+
+            //Generate key
+            String link = DirectoryUtils.EMPTY_STRING;
+            String linkHtml = DirectoryUtils.EMPTY_STRING;
+
+            if ( config.isEmailValidation(  ) )
+            {
+                ResourceKey resourceKey = new ResourceKey(  );
+                UUID key = java.util.UUID.randomUUID(  );
+                resourceKey.setKey( key.toString(  ) );
+                resourceKey.setIdResource( record.getIdRecord(  ) );
+                resourceKey.setResourceType( resourceHistory.getResourceType(  ) );
+                resourceKey.setIdTask( this.getId(  ) );
+
+                Calendar calendar = GregorianCalendar.getInstance(  );
+                calendar.add( Calendar.DAY_OF_MONTH, config.getPeriodValidity(  ) );
+                resourceKey.setDateExpiry( new Timestamp( calendar.getTimeInMillis(  ) ) );
+                ResourceKeyHome.create( resourceKey, pluginDirectory );
+                link = AppPropertiesService.getProperty( PROPERTY_URL ) + "/" + AppPathService.getPortalUrl(  ) +
+                    "?page=workflow&key=" + key.toString(  );
+                linkHtml = HTML_LINK_OPEN_1 + link + HTML_LINK_OPEN_2 + config.getLabelLink(  ) + HTML_LINK_CLOSE;
+
+                Map<String, Object> modelTmp = new HashMap<String, Object>(  );
+                modelTmp.put( MARK_LINK, link );
+                linkHtml = AppTemplateService.getTemplateFromStringFtl( linkHtml, locale, modelTmp ).getHtml(  );
+            }
+
+            model.put( MARK_LINK, linkHtml );
+
+            HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+                        TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
+
+            if ( config.isNotifyByEmail(  ) && ( strEmail != null ) &&
+                    !DirectoryUtils.EMPTY_STRING.equals( strEmail ) )
+            {
+                // Build the mail message
+                MailService.sendMailHtml( strEmail, config.getSenderName(  ), strSenderEmail,
+                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
+                    t.getHtml(  ) );
+            }
+
+            if ( config.isNotifyBySms(  ) && ( strSms != null ) && !DirectoryUtils.EMPTY_STRING.equals( strSms ) )
+            {
+                // Build the sms message
+                HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+                            TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
+                MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail,
+                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
+                    tSMS.getHtml(  ) );
             }
         }
     }
