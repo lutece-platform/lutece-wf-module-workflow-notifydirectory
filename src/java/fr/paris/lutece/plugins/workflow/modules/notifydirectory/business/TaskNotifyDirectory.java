@@ -565,11 +565,16 @@ public class TaskNotifyDirectory extends Task
 
             for ( RecordField recordField : listRecordField )
             {
-            	String value = recordField.getValue(  );
+            	String value = recordField.getEntry(  ).convertRecordFieldValueToString( recordField, request.getLocale(  ), false, false );
             	if ( isEntryTypeRefused( recordField.getEntry(  ) ) )
             	{
             		continue;
             	}
+            	else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation && 
+                		!recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
+                {
+                	continue;
+                }
             	else if ( recordField.getField(  ) != null && 
                 		!( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation ) )
                 {
@@ -581,11 +586,6 @@ public class TaskNotifyDirectory extends Task
                     {
                         value = listRecordField.get( 0 ).getField(  ).getTitle(  );
                     }
-                }
-                else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation && 
-                		!recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
-                {
-                	continue;
                 }
 
                 recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ),
