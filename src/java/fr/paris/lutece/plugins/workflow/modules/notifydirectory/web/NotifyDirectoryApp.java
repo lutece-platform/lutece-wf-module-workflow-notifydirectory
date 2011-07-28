@@ -33,15 +33,6 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.web;
 
-import java.sql.Timestamp;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import fr.paris.lutece.plugins.workflow.business.ActionHome;
 import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
 import fr.paris.lutece.plugins.workflow.business.ResourceHistoryHome;
@@ -71,6 +62,16 @@ import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+import java.sql.Timestamp;
+
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 
 /**
  * This class manages Form page.
@@ -78,20 +79,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  */
 public class NotifyDirectoryApp implements XPageApplication
 {
-    // properties for page titles and path label
-    
-
-    // markers
-    
-
-    //Message
-    
-
-    // templates
+    // Templates
     private static final String TEMPLATE_XPAGE_VALIDATION = "skin/plugins/workflow/modules/notifydirectory/task_notify_directory_validation.html";
-
-    // request parameters
-    
 
     /**
      * Returns the Form XPage result content depending on the request parameters and the current mode.
@@ -108,8 +97,10 @@ public class NotifyDirectoryApp implements XPageApplication
         XPage page = new XPage(  );
         HttpSession session = request.getSession(  );
 
-        page.setTitle( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PAGETITLE, request.getLocale(  ) ) );
-        page.setPathLabel( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PATHLABEL, request.getLocale(  ) ) );
+        page.setTitle( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PAGETITLE,
+                request.getLocale(  ) ) );
+        page.setPathLabel( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PATHLABEL,
+                request.getLocale(  ) ) );
         page.setContent( getValid( request, session, nMode, plugin ) );
 
         return page;
@@ -118,6 +109,7 @@ public class NotifyDirectoryApp implements XPageApplication
     /**
      * Perform formSubmit in database and return the result page
      * @param request The HTTP request
+     * @param session the session
      * @param nMode The current mode.
      * @param plugin The Plugin
      * @return the form recap
@@ -132,7 +124,8 @@ public class NotifyDirectoryApp implements XPageApplication
 
         if ( request.getParameter( NotifyDirectoryConstants.PARAMETER_KEY ) != null )
         {
-            ResourceKey resourceKey = ResourceKeyHome.findByPrimaryKey( request.getParameter( NotifyDirectoryConstants.PARAMETER_KEY ), plugin );
+            ResourceKey resourceKey = ResourceKeyHome.findByPrimaryKey( request.getParameter( 
+                        NotifyDirectoryConstants.PARAMETER_KEY ), plugin );
             Timestamp currentDate = new Timestamp( GregorianCalendar.getInstance(  ).getTimeInMillis(  ) );
 
             if ( ( resourceKey != null ) && currentDate.before( resourceKey.getDateExpiry(  ) ) )
@@ -176,11 +169,13 @@ public class NotifyDirectoryApp implements XPageApplication
             }
             else
             {
-                SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
+                SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION,
+                    AdminMessage.TYPE_ERROR );
             }
         }
 
-        SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
+        SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION,
+            AdminMessage.TYPE_ERROR );
 
         return null;
     }

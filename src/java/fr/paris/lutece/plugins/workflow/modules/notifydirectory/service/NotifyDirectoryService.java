@@ -33,20 +33,6 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
@@ -85,6 +71,21 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.url.UrlItem;
 import fr.paris.lutece.util.xml.XmlUtil;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.sql.Timestamp;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  *
@@ -103,12 +104,12 @@ public final class NotifyDirectoryService
      */
     private NotifyDirectoryService(  )
     {
-    	// Init list accepted entry types for email
+        // Init list accepted entry types for email
         _listAcceptedEntryTypesEmailSMS = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_EMAIL_SMS );
-        
+
         // Init list accepted entry types for user guid
         _listAcceptedEntryTypesUserGuid = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_USER_GUID );
-        
+
         // Init list refused entry types
         _listRefusedEntryTypes = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE_USER_GUID );
     }
@@ -151,7 +152,7 @@ public final class NotifyDirectoryService
     }
 
     // CHECKS
-    
+
     /**
      * Check if the given entry type id is accepted for the email or the sms
      * @param nIdEntryType the id entry type
@@ -168,7 +169,7 @@ public final class NotifyDirectoryService
 
         return bIsAccepted;
     }
-    
+
     /**
      * Check if the given entry type id is accepted for the user guid
      * @param nIdEntryType the id entry type
@@ -193,7 +194,7 @@ public final class NotifyDirectoryService
      */
     private boolean isEntryTypeRefused( int nIdEntryType )
     {
-    	boolean bIsRefused = true;
+        boolean bIsRefused = true;
 
         if ( ( _listRefusedEntryTypes != null ) && !_listRefusedEntryTypes.isEmpty(  ) )
         {
@@ -202,9 +203,9 @@ public final class NotifyDirectoryService
 
         return bIsRefused;
     }
-    
+
     // GETS
-    
+
     /**
      * Get the list of states
      * @param nIdAction the id action
@@ -230,7 +231,7 @@ public final class NotifyDirectoryService
 
         return referenceListStates;
     }
-    
+
     /**
      * Get the list of directorise
      * @return a ReferenceList
@@ -249,7 +250,7 @@ public final class NotifyDirectoryService
 
         return refenreceListDirectories;
     }
-    
+
     /**
      * Get the list of entries from a given id task
      * @param nIdTask the id task
@@ -299,7 +300,7 @@ public final class NotifyDirectoryService
 
         return refenreceListEntries;
     }
-    
+
     /**
      * Get the list of entries that have the accepted type (which are defined in <b>workflow-notifycrm.properties</b>)
      * @param nIdTask the id task
@@ -347,7 +348,7 @@ public final class NotifyDirectoryService
 
         return listEntries;
     }
-    
+
     /**
      * Get the email from either an entry containing the email, or an entry containing the user guid
      * @param config the config
@@ -376,7 +377,7 @@ public final class NotifyDirectoryService
 
         return strEmail;
     }
-    
+
     /**
      * Get the sms phone number
      * @param config the config
@@ -390,7 +391,7 @@ public final class NotifyDirectoryService
 
         if ( config.isNotifyBySms(  ) )
         {
-        	strSMSPhoneNumber = getRecordFieldValue( config.getPositionEntryDirectorySms(  ), nIdRecord, nIdDirectory );
+            strSMSPhoneNumber = getRecordFieldValue( config.getPositionEntryDirectorySms(  ), nIdRecord, nIdDirectory );
         }
 
         return strSMSPhoneNumber;
@@ -414,21 +415,22 @@ public final class NotifyDirectoryService
 
         return strUserGuid;
     }
-    
+
     /**
      * Fill the model
      * @param config the config
+     * @param resourceHistory the resource history
      * @param record the record
      * @param directory the directory
-     * @param locale the Locale
+         * @param request the HTTP request
      * @return the model
      */
-    public Map<String, String> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory, 
-    		Record record, Directory directory, HttpServletRequest request )
+    public Map<String, String> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
+        Record record, Directory directory, HttpServletRequest request )
     {
-    	Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-    	Map<String, String> model = new HashMap<String, String>(  );
-    	model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
+        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+        Map<String, String> model = new HashMap<String, String>(  );
+        model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
 
         //Directory directory = DirectoryHome.findByPrimaryKey( config.getIdDirectory(  ), pluginDirectory );
         if ( directory != null )
@@ -445,8 +447,7 @@ public final class NotifyDirectoryService
         for ( RecordField recordField : listRecordField )
         {
             String value = recordField.getEntry(  )
-                                      .convertRecordFieldValueToString( recordField, request.getLocale(  ), false,
-                    false );
+                                      .convertRecordFieldValueToString( recordField, request.getLocale(  ), false, false );
 
             if ( isEntryTypeRefused( recordField.getEntry(  ).getEntryType(  ).getIdType(  ) ) )
             {
@@ -470,9 +471,9 @@ public final class NotifyDirectoryService
                 }
             }
 
-            recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ),
-                    pluginDirectory ) );
-            model.put( NotifyDirectoryConstants.MARK_POSITION + String.valueOf( recordField.getEntry(  ).getPosition(  ) ), value );
+            recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ), pluginDirectory ) );
+            model.put( NotifyDirectoryConstants.MARK_POSITION +
+                String.valueOf( recordField.getEntry(  ).getPosition(  ) ), value );
         }
 
         if ( ( record.getDirectory(  ).getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) &&
@@ -500,13 +501,16 @@ public final class NotifyDirectoryService
             calendar.add( Calendar.DAY_OF_MONTH, config.getPeriodValidity(  ) );
             resourceKey.setDateExpiry( new Timestamp( calendar.getTimeInMillis(  ) ) );
             ResourceKeyHome.create( resourceKey, pluginDirectory );
-            
+
             StringBuilder sbBaseUrl = new StringBuilder( AppPathService.getBaseUrl( request ) );
-            if ( sbBaseUrl.length( ) > 0 && !sbBaseUrl.toString(  ).endsWith( NotifyDirectoryConstants.SLASH ) )
+
+            if ( ( sbBaseUrl.length(  ) > 0 ) && !sbBaseUrl.toString(  ).endsWith( NotifyDirectoryConstants.SLASH ) )
             {
-            	sbBaseUrl.append( NotifyDirectoryConstants.SLASH );
+                sbBaseUrl.append( NotifyDirectoryConstants.SLASH );
             }
+
             sbBaseUrl.append( AppPathService.getPortalUrl(  ) );
+
             UrlItem url = new UrlItem( sbBaseUrl.toString(  ) );
             url.addParameter( NotifyDirectoryConstants.PARAMETER_PAGE, WorkflowPlugin.PLUGIN_NAME );
             url.addParameter( NotifyDirectoryConstants.PARAMETER_KEY, key.toString(  ) );
@@ -517,7 +521,7 @@ public final class NotifyDirectoryService
             XmlUtil.beginElement( sbLinkHtml, NotifyDirectoryConstants.TAG_A, mapParams );
             sbLinkHtml.append( config.getLabelLink(  ) );
             XmlUtil.endElement( sbLinkHtml, NotifyDirectoryConstants.TAG_A );
-            
+
             linkHtml = sbLinkHtml.toString(  );
 
             Map<String, Object> modelTmp = new HashMap<String, Object>(  );
@@ -526,17 +530,17 @@ public final class NotifyDirectoryService
         }
 
         model.put( NotifyDirectoryConstants.MARK_LINK, linkHtml );
-    	
-    	// Fill user attributes
-    	if ( WorkflowWebService.isUserAttributeWSActive(  ) )
+
+        // Fill user attributes
+        if ( WorkflowWebService.isUserAttributeWSActive(  ) )
         {
             String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
             WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strUserGuid );
         }
-    	
-    	return model;
+
+        return model;
     }
-    
+
     /**
      * Build the reference entry into String
      * @param entry the entry
@@ -549,7 +553,8 @@ public final class NotifyDirectoryService
         sbReferenceEntry.append( entry.getPosition(  ) );
         sbReferenceEntry.append( NotifyDirectoryConstants.SPACE + NotifyDirectoryConstants.OPEN_BRACKET );
         sbReferenceEntry.append( entry.getTitle(  ) );
-        sbReferenceEntry.append( NotifyDirectoryConstants.SPACE + NotifyDirectoryConstants.HYPHEN + NotifyDirectoryConstants.SPACE );
+        sbReferenceEntry.append( NotifyDirectoryConstants.SPACE + NotifyDirectoryConstants.HYPHEN +
+            NotifyDirectoryConstants.SPACE );
         sbReferenceEntry.append( I18nService.getLocalizedString( entry.getEntryType(  ).getTitleI18nKey(  ), locale ) );
         sbReferenceEntry.append( NotifyDirectoryConstants.CLOSED_BRACKET );
 

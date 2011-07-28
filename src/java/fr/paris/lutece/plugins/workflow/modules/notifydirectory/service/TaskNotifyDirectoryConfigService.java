@@ -33,12 +33,12 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
-import java.util.List;
-
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import java.util.List;
 
 
 /**

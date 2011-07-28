@@ -59,16 +59,16 @@ public class TaskNotifyDirectoryConfig
     private int _nPeriodValidity;
 
     /**
-    *
-    * @return id Task
-    */
+     * Get the id task
+     * @return id Task
+     */
     public int getIdTask(  )
     {
         return _nIdTask;
     }
 
     /**
-     * set id Task
+     * Set id Task
      * @param idTask id task
      */
     public void setIdTask( int idTask )
@@ -86,8 +86,8 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set id directory
-     * @param idTaskWorkflow id directory
+     * Set id directory
+     * @param idDirectory id directory
      */
     public void setIdDirectory( int idDirectory )
     {
@@ -95,17 +95,17 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return position Entry directory Email
-    */
+     * Get the position of the entry directory form email
+     * @return position Entry directory Email
+     */
     public int getPositionEntryDirectoryEmail(  )
     {
         return _nPositionEntryDirectoryEmail;
     }
 
     /**
-     * set position Entry directory Email
-     * @param idEntryDirectoryEmail position of Entry directory Email
+     * Set position Entry directory Email
+     * @param nPositionEntryDirectoryEmail position of Entry directory Email
      */
     public void setPositionEntryDirectoryEmail( int nPositionEntryDirectoryEmail )
     {
@@ -113,7 +113,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     *
+     * Get the position of the entry directory for sms
      * @return position Entry directory Sms
      */
     public int getPositionEntryDirectorySms(  )
@@ -122,8 +122,8 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set position of Entry directory Sms
-     * @param idTaskWorkflow position of Entry directory Sms
+     * Set position of Entry directory Sms
+     * @param nPositionEntryDirectorySms position of Entry directory Sms
      */
     public void setPositionEntryDirectorySms( int nPositionEntryDirectorySms )
     {
@@ -149,16 +149,16 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return the subject of the message
-    */
+     * Get the subject
+     * @return the subject of the message
+     */
     public String getSubject(  )
     {
         return _strSubject;
     }
 
     /**
-     * set the subject of the message
+     * Set the subject of the message
      * @param subject the subject of the message
      */
     public void setSubject( String subject )
@@ -167,7 +167,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     *
+     * Get the message
      * @return the message of the notification
      */
     public String getMessage(  )
@@ -176,7 +176,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set the message of the notification
+     * Set the message of the notification
      * @param message the message of the notifictaion
      */
     public void setMessage( String message )
@@ -185,7 +185,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     *
+     * Get the sender name
      * @return the sender name
      */
     public String getSenderName(  )
@@ -194,8 +194,8 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set the sender name
-     * @param senderName  the sender name
+     * Set the sender name
+     * @param senderName the sender name
      */
     public void setSenderName( String senderName )
     {
@@ -203,17 +203,17 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return true if notify by Email
-    */
+     * Check if it is notify by mail
+     * @return true if notify by Email
+     */
     public boolean isNotifyByEmail(  )
     {
         return _bIsNotifyByEmail;
     }
 
     /**
-     * set true if notify by Email
-     * @param true if notify by Email
+     * Set true if notify by Email
+     * @param bIsNotifyByEmail true if notify by Email
      */
     public void setNotifyByEmail( boolean bIsNotifyByEmail )
     {
@@ -221,17 +221,17 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return true if notify by Sms
-    */
+     * Check if it is notify by sms
+     * @return true if notify by Sms
+     */
     public boolean isNotifyBySms(  )
     {
         return _bIsNotifyBySms;
     }
 
     /**
-     * set true if notify by Sms
-     * @param enable true if notify by Sms
+     * Set true if notify by Sms
+     * @param bIsNotifyBySms enable true if notify by Sms
      */
     public void setNotifyBySms( boolean bIsNotifyBySms )
     {
@@ -257,17 +257,17 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return true if the email is email validation
-    */
+     * Check if it must have an email validation
+     * @return true if the email is email validation
+     */
     public boolean isEmailValidation(  )
     {
         return _bEmailValidation;
     }
 
     /**
-     * set true if the email is email validation
-     * @param enable true if the email is email validation
+     * Set true if the email is email validation
+     * @param bEmailValidation enable true if the email is email validation
      */
     public void setEmailValidation( boolean bEmailValidation )
     {
@@ -275,7 +275,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     *
+     * Get the id state after validation
      * @return id Entry directory
      */
     public int getIdStateAfterValidation(  )
@@ -284,16 +284,16 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set id of State Workflow after validation
-     * @param idTaskWorkflow id of Task Workflow
+     * Set id of State Workflow after validation
+     * @param nIdStateAfterValidation the id state after validation
      */
-    public void setIdStateAfterValidation( int idStateAfterValidation )
+    public void setIdStateAfterValidation( int nIdStateAfterValidation )
     {
-        _nIdStateAfterValidation = idStateAfterValidation;
+        _nIdStateAfterValidation = nIdStateAfterValidation;
     }
 
     /**
-     *
+     * Get the label link
      * @return the label link
      */
     public String getLabelLink(  )
@@ -302,7 +302,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set the label link
+     * Set the label link
      * @param strLabelLink the label link
      */
     public void setLabelLink( String strLabelLink )
@@ -311,7 +311,7 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     *
+     * Get the message validation
      * @return the message of validation
      */
     public String getMessageValidation(  )
@@ -320,8 +320,8 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-     * set the message of the validation
-     * @param message the message of the validation
+     * Set the message of the validation
+     * @param messageValidation the message of the validation
      */
     public void setMessageValidation( String messageValidation )
     {
@@ -329,16 +329,16 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
-    *
-    * @return nPeriodValidity
-    */
+     * Get the period validity
+     * @return nPeriodValidity
+     */
     public int getPeriodValidity(  )
     {
         return _nPeriodValidity;
     }
 
     /**
-     * set nPeriodValidity
+     * Set nPeriodValidity
      * @param nPeriodValidity period of validity
      */
     public void setPeriodValidity( int nPeriodValidity )

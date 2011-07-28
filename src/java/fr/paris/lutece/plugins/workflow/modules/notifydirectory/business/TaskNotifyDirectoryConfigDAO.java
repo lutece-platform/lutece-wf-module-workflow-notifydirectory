@@ -59,9 +59,8 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity " +
         "FROM task_notify_directory_cf";
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO#insert(fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public synchronized void insert( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
@@ -90,9 +89,8 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO#store(fr.paris.lutece.plugins.workflow.modules.bourserecherche.business.TaskEvaluationExpertConfig, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public void store( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
@@ -122,9 +120,8 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO#load(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public TaskNotifyDirectoryConfig load( int nIdTask, Plugin plugin )
     {
@@ -163,9 +160,8 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         return config;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO#delete(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public void delete( int nIdState, Plugin plugin )
     {
@@ -176,9 +172,8 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO#load(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public List<TaskNotifyDirectoryConfig> loadAll( Plugin plugin )
     {

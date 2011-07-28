@@ -33,14 +33,6 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.business.Record;
@@ -67,6 +59,14 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  *
@@ -80,21 +80,20 @@ public class TaskNotifyDirectory extends Task
     private static final String TEMPLATE_TASK_NOTIFY_MAIL = "admin/plugins/workflow/modules/notifydirectory/task_notify_directory_mail.html";
     private static final String TEMPLATE_TASK_NOTIFY_SMS = "admin/plugins/workflow/modules/notifydirectory/task_notify_directory_sms.html";
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#init()
+    /**
+     * {@inheritDoc}
      */
     public void init(  )
     {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.ITaskListener#doSaveConfig(fr.paris.lutece.plugins.workflow.business.Action, javax.servlet.http.HttpServletRequest)
+    /**
+     * {@inheritDoc}
      */
     public String doSaveConfig( HttpServletRequest request, Locale locale, Plugin plugin )
     {
-        int nNotify = DirectoryUtils.convertStringToInt( request.getParameter( NotifyDirectoryConstants.PARAMETER_NOTIFY ) );
+        int nNotify = DirectoryUtils.convertStringToInt( request.getParameter( 
+                    NotifyDirectoryConstants.PARAMETER_NOTIFY ) );
         String strSenderName = request.getParameter( NotifyDirectoryConstants.PARAMETER_SENDER_NAME );
         String strSubject = request.getParameter( NotifyDirectoryConstants.PARAMETER_SUBJECT );
         String strMessage = request.getParameter( NotifyDirectoryConstants.PARAMETER_MESSAGE );
@@ -106,16 +105,20 @@ public class TaskNotifyDirectory extends Task
         String strPositionEntryDirectoryUserGuid = request.getParameter( NotifyDirectoryConstants.PARAMETER_POSITION_ENTRY_DIRECTORY_USER_GUID );
         int nPositionEntryDirectoryUserGuid = WorkflowUtils.convertStringToInt( strPositionEntryDirectoryUserGuid );
         int nIdDirectory = WorkflowUtils.convertStringToInt( strIdDirectory );
-        int nIdState = DirectoryUtils.convertStringToInt( request.getParameter( NotifyDirectoryConstants.PARAMETER_ID_STATE ) );
+        int nIdState = DirectoryUtils.convertStringToInt( request.getParameter( 
+                    NotifyDirectoryConstants.PARAMETER_ID_STATE ) );
         String emailValidation = request.getParameter( NotifyDirectoryConstants.PARAMETER_EMAIL_VALIDATION );
         String strMessageValidation = request.getParameter( NotifyDirectoryConstants.PARAMETER_MESSAGE_VALIDATION );
         String strLabelLink = request.getParameter( NotifyDirectoryConstants.PARAMETER_LABEL_LINK );
-        int nPeriodValidity = DirectoryUtils.convertStringToInt( request.getParameter( NotifyDirectoryConstants.PARAMETER_PERIOD_VALIDTY ) );
-        boolean bIsNotifyByUserGuid = StringUtils.isNotBlank( request.getParameter( NotifyDirectoryConstants.PARAMETER_IS_NOTIFY_BY_USER_GUID ) );
+        int nPeriodValidity = DirectoryUtils.convertStringToInt( request.getParameter( 
+                    NotifyDirectoryConstants.PARAMETER_PERIOD_VALIDTY ) );
+        boolean bIsNotifyByUserGuid = StringUtils.isNotBlank( request.getParameter( 
+                    NotifyDirectoryConstants.PARAMETER_IS_NOTIFY_BY_USER_GUID ) );
 
         String strError = StringUtils.EMPTY;
 
-        if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) && ( nNotify == DirectoryUtils.CONSTANT_ID_NULL ) )
+        if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
+                ( nNotify == DirectoryUtils.CONSTANT_ID_NULL ) )
         {
             strError = NotifyDirectoryConstants.FIELD_NOTIFY;
         }
@@ -125,13 +128,15 @@ public class TaskNotifyDirectory extends Task
         }
         else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
                 ( nPositionEntryDirectorySms == WorkflowUtils.CONSTANT_ID_NULL ) &&
-                ( ( nNotify == NotificationTypeEnum.SMS.getId(  ) ) || ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
+                ( ( nNotify == NotificationTypeEnum.SMS.getId(  ) ) ||
+                ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
         {
             strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_SMS;
         }
         else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
                 ( nPositionEntryDirectoryEmail == WorkflowUtils.CONSTANT_ID_NULL ) && !bIsNotifyByUserGuid &&
-                ( ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) ) || ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
+                ( ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) ) ||
+                ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
         {
             strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_EMAIL;
         }
@@ -150,8 +155,8 @@ public class TaskNotifyDirectory extends Task
         {
             strError = NotifyDirectoryConstants.FIELD_MESSAGE;
         }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) && ( nIdState == WorkflowUtils.CONSTANT_ID_NULL ) &&
-                ( emailValidation != null ) )
+        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
+                ( nIdState == WorkflowUtils.CONSTANT_ID_NULL ) && ( emailValidation != null ) )
         {
             strError = NotifyDirectoryConstants.FIELD_STATE;
         }
@@ -182,8 +187,8 @@ public class TaskNotifyDirectory extends Task
         {
             Object[] tabRequiredFields = { I18nService.getLocalizedString( strError, locale ) };
 
-            return AdminMessageService.getMessageUrl( request, NotifyDirectoryConstants.MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                AdminMessage.TYPE_STOP );
+            return AdminMessageService.getMessageUrl( request, NotifyDirectoryConstants.MESSAGE_MANDATORY_FIELD,
+                tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
         if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
@@ -192,11 +197,11 @@ public class TaskNotifyDirectory extends Task
             Object[] tabRequiredFields = 
                 {
                     I18nService.getLocalizedString( NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_EMAIL, locale ),
-                    I18nService.getLocalizedString( NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_SMS, locale )
+                    I18nService.getLocalizedString( NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_SMS, locale ),
                 };
 
-            return AdminMessageService.getMessageUrl( request, NotifyDirectoryConstants.MESSAGE_EQUAL_FIELD, tabRequiredFields,
-                AdminMessage.TYPE_STOP );
+            return AdminMessageService.getMessageUrl( request, NotifyDirectoryConstants.MESSAGE_EQUAL_FIELD,
+                tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
         TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( this.getId(  ), plugin );
@@ -251,9 +256,8 @@ public class TaskNotifyDirectory extends Task
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#doValidateTask(int, java.lang.String, javax.servlet.http.HttpServletRequest, java.util.Locale, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public String doValidateTask( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale,
         Plugin plugin )
@@ -261,39 +265,41 @@ public class TaskNotifyDirectory extends Task
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.ITaskListener#getDisplayConfigForm(fr.paris.lutece.plugins.workflow.business.Action, javax.servlet.http.HttpServletRequest)
+    /**
+     * {@inheritDoc}
      */
     public String getDisplayConfigForm( HttpServletRequest request, Plugin plugin, Locale locale )
     {
-    	NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
-    	TaskNotifyDirectoryConfigService configService = TaskNotifyDirectoryConfigService.getService(  );
+        NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
+        TaskNotifyDirectoryConfigService configService = TaskNotifyDirectoryConfigService.getService(  );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME );
-        
+
         Map<String, Object> model = new HashMap<String, Object>(  );
-        
+
         model.put( NotifyDirectoryConstants.MARK_CONFIG, configService.findByPrimaryKey( getId(  ), plugin ) );
         model.put( NotifyDirectoryConstants.MARK_DEFAULT_SENDER_NAME, strDefaultSenderName );
-        model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_EMAIL_SMS, notifyDirectoryService.getListEntriesEmailSMS( getId(  ), locale ) );
-        model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FREEMARKER, notifyDirectoryService.getListEntriesFreemarker( getId(  ) ) );
+        model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_EMAIL_SMS,
+            notifyDirectoryService.getListEntriesEmailSMS( getId(  ), locale ) );
+        model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FREEMARKER,
+            notifyDirectoryService.getListEntriesFreemarker( getId(  ) ) );
         model.put( NotifyDirectoryConstants.MARK_DIRECTORY_LIST, notifyDirectoryService.getListDirectories(  ) );
-        model.put( NotifyDirectoryConstants.MARK_STATE_LIST, notifyDirectoryService.getListStates( getAction(  ).getId(  ) ) );
+        model.put( NotifyDirectoryConstants.MARK_STATE_LIST,
+            notifyDirectoryService.getListStates( getAction(  ).getId(  ) ) );
         model.put( NotifyDirectoryConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyDirectoryConstants.MARK_LOCALE, request.getLocale(  ) );
-        model.put( NotifyDirectoryConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE, WorkflowWebService.isUserAttributeWSActive(  ) );
+        model.put( NotifyDirectoryConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE,
+            WorkflowWebService.isUserAttributeWSActive(  ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
-        		notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
+            notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG, locale, model );
 
         return template.getHtml(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#getDisplayTaskForm(int, java.lang.String, javax.servlet.http.HttpServletRequest, fr.paris.lutece.portal.service.plugin.Plugin, java.util.Locale)
+    /**
+     * {@inheritDoc}
      */
     public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request,
         Plugin plugin, Locale locale )
@@ -301,18 +307,16 @@ public class TaskNotifyDirectory extends Task
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.ITaskListener#getDisplayTaskInformation(int, java.lang.String, javax.servlet.http.HttpServletRequest, fr.paris.lutece.plugins.workflow.business.Action)
+    /**
+     * {@inheritDoc}
      */
     public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
     {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.ITaskListener#processTask(int, java.lang.String, javax.servlet.http.HttpServletRequest, fr.paris.lutece.plugins.workflow.business.Action)
+    /**
+     * {@inheritDoc}
      */
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Plugin plugin, Locale locale )
     {
@@ -320,28 +324,31 @@ public class TaskNotifyDirectory extends Task
         TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( this.getId(  ), plugin );
 
         if ( ( config != null ) && ( resourceHistory != null ) &&
-        		Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
+                Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
         {
-        	NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
-        	Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        	
+            NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
+            Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+
             // Record
             Record record = RecordHome.findByPrimaryKey( resourceHistory.getIdResource(  ), pluginDirectory );
             Directory directory = DirectoryHome.findByPrimaryKey( record.getDirectory(  ).getIdDirectory(  ),
                     pluginDirectory );
             record.setDirectory( directory );
-            
+
             // Get email
-            String strEmail = notifyDirectoryService.getEmail( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
+            String strEmail = notifyDirectoryService.getEmail( config, record.getIdRecord(  ),
+                    directory.getIdDirectory(  ) );
 
             // Get Sms
-            String strSms = notifyDirectoryService.getSMSPhoneNumber( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
+            String strSms = notifyDirectoryService.getSMSPhoneNumber( config, record.getIdRecord(  ),
+                    directory.getIdDirectory(  ) );
             String strServerSms = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_SERVER_SMS );
 
             // Get sender email
             String strSenderEmail = MailService.getNoReplyEmail(  );
 
-            Map<String, String> model = notifyDirectoryService.fillModel( config, resourceHistory, record, directory, request );           
+            Map<String, String> model = notifyDirectoryService.fillModel( config, resourceHistory, record, directory,
+                    request );
 
             HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                         TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
@@ -366,54 +373,47 @@ public class TaskNotifyDirectory extends Task
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#doRemoveConfig()
+    /**
+     * {@inheritDoc}
      */
     public void doRemoveConfig( Plugin plugin )
     {
         TaskNotifyDirectoryConfigHome.remove( this.getId(  ), plugin );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#isConfigRequire()
+    /**
+     * {@inheritDoc}
      */
     public boolean isConfigRequire(  )
     {
-        // TODO Auto-generated method stub
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#isFormTaskRequire()
+    /**
+     * {@inheritDoc}
      */
     public boolean isFormTaskRequire(  )
     {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#doRemoveTaskInformation(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public void doRemoveTaskInformation( int nIdHistory, Plugin plugin )
     {
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#getTaskInformationXml(int, javax.servlet.http.HttpServletRequest, fr.paris.lutece.portal.service.plugin.Plugin, java.util.Locale)
+    /**
+     * {@inheritDoc}
      */
     public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
     {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#getTitle(fr.paris.lutece.portal.service.plugin.Plugin, java.util.Locale)
+    /**
+     * {@inheritDoc}
      */
     public String getTitle( Plugin plugin, Locale locale )
     {
@@ -427,45 +427,19 @@ public class TaskNotifyDirectory extends Task
         return WorkflowUtils.EMPTY_STRING;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#getTaskFormEntries(fr.paris.lutece.portal.service.plugin.Plugin, java.util.Locale)
+    /**
+     * {@inheritDoc}
      */
     public ReferenceList getTaskFormEntries( Plugin plugin, Locale locale )
     {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.business.task.ITask#isTaskForActionAutomatic()
+    /**
+     * {@inheritDoc}
      */
     public boolean isTaskForActionAutomatic(  )
     {
         return true;
-    }
-
-    /**
-     * 
-     * NotificationTypeEnum
-     *
-     */
-    private enum NotificationTypeEnum
-    {EMAIL(1),
-    	SMS(2),
-    	EMAIL_SMS(3);
-    
-    	private int _nId;
-    	
-    	private NotificationTypeEnum( int nId )
-    	{
-    		_nId = nId;
-    	}
-    	
-    	public int getId(  )
-    	{
-    		return _nId;
-    	}
-    	
     }
 }

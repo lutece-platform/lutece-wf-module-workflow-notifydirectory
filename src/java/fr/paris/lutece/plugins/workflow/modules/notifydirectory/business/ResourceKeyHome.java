@@ -105,6 +105,7 @@ public final class ResourceKeyHome
     /**
      * Delete a ResourceKey expiry
      * @param plugin the plugin
+     * @return a list of {@link ResourceKey}
      */
     public static List<ResourceKey> selectResourceExpiry( Plugin plugin )
     {

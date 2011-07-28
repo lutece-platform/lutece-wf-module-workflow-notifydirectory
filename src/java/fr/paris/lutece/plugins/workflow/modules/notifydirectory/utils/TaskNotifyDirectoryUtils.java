@@ -49,12 +49,24 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 
-public class TaskNotifyDirectoryUtils
+/**
+ *
+ * TaskNotifyDirectoryUtils
+ *
+ */
+public final class TaskNotifyDirectoryUtils
 {
     /**
+     * Private constructor
+     */
+    private TaskNotifyDirectoryUtils(  )
+    {
+    }
+
+    /**
      * Return the parameters
-     * @param request
-     * @param strParameterName
+     * @param request the HTTP request
+     * @param strParameterName the parameter name
      * @return List<String> return the parameters by type Multiple Choise
      */
     public static List<String> getParameterValuesTypeMultipleChoice( HttpServletRequest request, String strParameterName )
@@ -75,8 +87,8 @@ public class TaskNotifyDirectoryUtils
 
     /**
      * Return the parameters
-     * @param request
-     * @param strParameterName
+     * @param request the HTTP request
+     * @param strParameterName the parameter name
      * @return List<String> return the parameters
      */
     public static List<String> getParameterValue( HttpServletRequest request, String strParameterName )
@@ -90,14 +102,14 @@ public class TaskNotifyDirectoryUtils
 
     /**
      * getRecordFieldData by type File
-     * @param entry
-     * @param record
-     * @param request
-     * @param bTestDirectoryError
-     * @param listRecordField
-     * @param locale
-     * @param strParameterName
-     * @throws DirectoryErrorException
+     * @param entry the entry
+     * @param record the record
+     * @param request the HTTP request
+     * @param bTestDirectoryError the test directory error
+     * @param listRecordField the list of record fields
+     * @param locale the Locale
+     * @param strParameterName the parameter name
+     * @throws DirectoryErrorException exception if regular expresion not matched
      */
     public static void getRecordFieldDataTypeFile( IEntry entry, Record record, HttpServletRequest request,
         boolean bTestDirectoryError, List<RecordField> listRecordField, Locale locale, String strParameterName )

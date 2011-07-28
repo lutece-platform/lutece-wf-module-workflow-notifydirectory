@@ -33,14 +33,15 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants;
 
+
 /**
- * 
+ *
  * NotifyDirectoryConstants
  *
  */
 public final class NotifyDirectoryConstants
 {
-	// CONSTANTS
+    // CONSTANTS
     public static final String COMMA = ",";
     public static final String SPACE = " ";
     public static final String OPEN_BRACKET = "(";
@@ -50,7 +51,7 @@ public final class NotifyDirectoryConstants
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String USER_AUTO = "auto";
-    
+
     // FIELDS
     public static final String FIELD_NOTIFY = "module.workflow.notifydirectory.task_notify_directory_config.label_notify_by";
     public static final String FIELD_SUBJECT = "module.workflow.notifydirectory.task_notify_directory_config.label_subject";
@@ -69,7 +70,7 @@ public final class NotifyDirectoryConstants
     public static final String MESSAGE_MANDATORY_FIELD = "module.workflow.notifydirectory.message.mandatory.field";
     public static final String MESSAGE_EQUAL_FIELD = "module.workflow.notifydirectory.message.equal.field";
     public static final String MESSAGE_ERROR_VALIDATION = "module.workflow.notifydirectory.message.error_validation";
-    
+
     // PROPERTIES
     public static final String PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_EMAIL_SMS = "workflow-notifydirectory.acceptedDirectoryEntryTypesEmailSMS";
     public static final String PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_USER_GUID = "workflow-notifydirectory.acceptedDirectoryEntryTypesUserGuid";
@@ -78,7 +79,7 @@ public final class NotifyDirectoryConstants
     public static final String PROPERTY_SERVER_SMS = "workflow-notifydirectory.email_server_sms";
     public static final String PROPERTY_XPAGE_PAGETITLE = "module.workflow.notifydirectory.xpage.pagetitle";
     public static final String PROPERTY_XPAGE_PATHLABEL = "module.workflow.notifydirectory.xpage.pathlabel";
-    
+
     // MARKS
     public static final String MARK_MESSAGE = "message";
     public static final String MARK_STATUS = "status";
@@ -97,7 +98,7 @@ public final class NotifyDirectoryConstants
     public static final String MARK_IS_USER_ATTRIBUTE_WS_ACTIVE = "is_user_attribute_ws_active";
     public static final String MARK_LIST_ENTRIES_USER_GUID = "list_entries_user_guid";
     public static final String MARK_MESSAGE_VALIDATION = "message_validation_success";
-    
+
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
     public static final String PARAMETER_KEY = "key";
@@ -116,17 +117,17 @@ public final class NotifyDirectoryConstants
     public static final String PARAMETER_LABEL_LINK = "label_link";
     public static final String PARAMETER_PERIOD_VALIDTY = "period_validity";
     public static final String PARAMETER_IS_NOTIFY_BY_USER_GUID = "is_notify_by_user_guid";
-    
+
     // TAGS
     public static final String TAG_A = "a";
-    
+
     // ATTRIBUTES
     public static final String ATTRIBUTE_HREF = "href";
-	
-	/**
-	 * Private constructor
-	 */
-	private NotifyDirectoryConstants(  )
-	{
-	}
+
+    /**
+     * Private constructor
+     */
+    private NotifyDirectoryConstants(  )
+    {
+    }
 }

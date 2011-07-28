@@ -56,9 +56,8 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     private static final String SQL_QUERY_DELETE = "DELETE FROM task_notify_directory_key WHERE key_email=?";
     private static final String SQL_QUERY_DELETE_EXPIRY = "SELECT key_email,id_task,id_resource,resource_type,date_expiry FROM task_notify_directory_key WHERE date_expiry<NOW()";
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO#insert(fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public synchronized void insert( ResourceKey resourceKey, Plugin plugin )
     {
@@ -76,9 +75,8 @@ public class ResourceKeyDAO implements IResourceKeyDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO#store(fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public void store( ResourceKey resourceKey, Plugin plugin )
     {
@@ -97,9 +95,8 @@ public class ResourceKeyDAO implements IResourceKeyDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO#load(String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public ResourceKey load( String strKey, Plugin plugin )
     {
@@ -126,9 +123,8 @@ public class ResourceKeyDAO implements IResourceKeyDAO
         return resourceKey;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO#delete(String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public void delete( String strKey, Plugin plugin )
     {
@@ -139,9 +135,8 @@ public class ResourceKeyDAO implements IResourceKeyDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO#deleteExpiry(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
     public List<ResourceKey> selectResourceExpiry( Plugin plugin )
     {
