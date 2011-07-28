@@ -33,6 +33,15 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.web;
 
+import java.sql.Timestamp;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import fr.paris.lutece.plugins.workflow.business.ActionHome;
 import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
 import fr.paris.lutece.plugins.workflow.business.ResourceHistoryHome;
@@ -45,6 +54,7 @@ import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.Resourc
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.WorkflowService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
@@ -61,15 +71,6 @@ import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-import java.sql.Timestamp;
-
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 
 /**
  * This class manages Form page.
@@ -78,22 +79,19 @@ import javax.servlet.http.HttpSession;
 public class NotifyDirectoryApp implements XPageApplication
 {
     // properties for page titles and path label
-    private static final String PROPERTY_XPAGE_PAGETITLE = "module.workflow.notifydirectory.xpage.pagetitle";
-    private static final String PROPERTY_XPAGE_PATHLABEL = "module.workflow.notifydirectory.xpage.pathlabel";
+    
 
     // markers
-    private static final String MARK_MESSAGE_VALIDATION = "message_validation_success";
+    
 
     //Message
-    private static final String MESSAGE_ERROR_VALIDATION = "module.workflow.notifydirectory.message.error_validation";
-    private static final String MESSAGE_ERROR_URL = "module.workflow.notifydirectory.message.error_url";
+    
 
     // templates
     private static final String TEMPLATE_XPAGE_VALIDATION = "skin/plugins/workflow/modules/notifydirectory/task_notify_directory_validation.html";
 
     // request parameters
-    private static final String PARAMETER_KEY = "key";
-    private static final String USER_AUTO = "auto";
+    
 
     /**
      * Returns the Form XPage result content depending on the request parameters and the current mode.
@@ -110,8 +108,8 @@ public class NotifyDirectoryApp implements XPageApplication
         XPage page = new XPage(  );
         HttpSession session = request.getSession(  );
 
-        page.setTitle( I18nService.getLocalizedString( PROPERTY_XPAGE_PAGETITLE, request.getLocale(  ) ) );
-        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_XPAGE_PATHLABEL, request.getLocale(  ) ) );
+        page.setTitle( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PAGETITLE, request.getLocale(  ) ) );
+        page.setPathLabel( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PATHLABEL, request.getLocale(  ) ) );
         page.setContent( getValid( request, session, nMode, plugin ) );
 
         return page;
@@ -130,11 +128,11 @@ public class NotifyDirectoryApp implements XPageApplication
     {
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         Locale locale = request.getLocale(  );
-        HashMap model = new HashMap(  );
+        Map<String, Object> model = new HashMap<String, Object>(  );
 
-        if ( request.getParameter( PARAMETER_KEY ) != null )
+        if ( request.getParameter( NotifyDirectoryConstants.PARAMETER_KEY ) != null )
         {
-            ResourceKey resourceKey = ResourceKeyHome.findByPrimaryKey( request.getParameter( PARAMETER_KEY ), plugin );
+            ResourceKey resourceKey = ResourceKeyHome.findByPrimaryKey( request.getParameter( NotifyDirectoryConstants.PARAMETER_KEY ), plugin );
             Timestamp currentDate = new Timestamp( GregorianCalendar.getInstance(  ).getTimeInMillis(  ) );
 
             if ( ( resourceKey != null ) && currentDate.before( resourceKey.getDateExpiry(  ) ) )
@@ -153,7 +151,7 @@ public class NotifyDirectoryApp implements XPageApplication
                 resourceHistory.setAction( action );
                 resourceHistory.setWorkFlow( action.getWorkflow(  ) );
                 resourceHistory.setCreationDate( WorkflowUtils.getCurrentTimestamp(  ) );
-                resourceHistory.setUserAccessCode( USER_AUTO );
+                resourceHistory.setUserAccessCode( NotifyDirectoryConstants.USER_AUTO );
                 ResourceHistoryHome.create( resourceHistory, plugin );
 
                 // Update Resource
@@ -170,7 +168,7 @@ public class NotifyDirectoryApp implements XPageApplication
                                .executeActionAutomatic( resourceKey.getIdResource(  ), resourceKey.getResourceType(  ),
                     action.getWorkflow(  ).getId(  ), resourceWorkflow.getExternalParentId(  ) );
 
-                model.put( MARK_MESSAGE_VALIDATION, config.getMessageValidation(  ) );
+                model.put( NotifyDirectoryConstants.MARK_MESSAGE_VALIDATION, config.getMessageValidation(  ) );
 
                 HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_XPAGE_VALIDATION, locale, model );
 
@@ -178,11 +176,11 @@ public class NotifyDirectoryApp implements XPageApplication
             }
             else
             {
-                SiteMessageService.setMessage( request, MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
+                SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
             }
         }
 
-        SiteMessageService.setMessage( request, MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
+        SiteMessageService.setMessage( request, NotifyDirectoryConstants.MESSAGE_ERROR_VALIDATION, AdminMessage.TYPE_ERROR );
 
         return null;
     }

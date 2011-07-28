@@ -11,5 +11,8 @@
     		 <property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectory"/>
    	  </bean>
    	  
+   	  <!-- Service -->
+   	  <bean id="workflow-notifydirectory.notifyDirectoryService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService" />
+   	  <bean id="workflow-notifydirectory.taskNotifyDirectoryConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService" />
 </beans>
  	

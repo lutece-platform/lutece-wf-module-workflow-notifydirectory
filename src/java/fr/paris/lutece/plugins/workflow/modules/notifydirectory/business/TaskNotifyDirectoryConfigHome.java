@@ -41,7 +41,7 @@ import java.util.List;
 
 
 /**
- * TaskEvaluationExpertConfigHome
+ * TaskNotifyDirectoryConfigHome
  */
 public final class TaskNotifyDirectoryConfigHome
 {
