@@ -204,7 +204,8 @@ public class TaskNotifyDirectory extends Task
                 tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( this.getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
+                                                                           .findByPrimaryKey( this.getId(  ), plugin );
         Boolean bCreate = false;
 
         if ( config == null )
@@ -246,11 +247,11 @@ public class TaskNotifyDirectory extends Task
 
         if ( bCreate )
         {
-            TaskNotifyDirectoryConfigHome.create( config, plugin );
+            TaskNotifyDirectoryConfigService.getService(  ).create( config, plugin );
         }
         else
         {
-            TaskNotifyDirectoryConfigHome.update( config, plugin );
+            TaskNotifyDirectoryConfigService.getService(  ).update( config, plugin );
         }
 
         return null;
@@ -321,7 +322,8 @@ public class TaskNotifyDirectory extends Task
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Plugin plugin, Locale locale )
     {
         ResourceHistory resourceHistory = ResourceHistoryHome.findByPrimaryKey( nIdResourceHistory, plugin );
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( this.getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
+                                                                           .findByPrimaryKey( this.getId(  ), plugin );
 
         if ( ( config != null ) && ( resourceHistory != null ) &&
                 Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
@@ -378,7 +380,7 @@ public class TaskNotifyDirectory extends Task
      */
     public void doRemoveConfig( Plugin plugin )
     {
-        TaskNotifyDirectoryConfigHome.remove( this.getId(  ), plugin );
+        TaskNotifyDirectoryConfigService.getService(  ).remove( this.getId(  ), plugin );
     }
 
     /**
@@ -417,7 +419,8 @@ public class TaskNotifyDirectory extends Task
      */
     public String getTitle( Plugin plugin, Locale locale )
     {
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( this.getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
+                                                                           .findByPrimaryKey( this.getId(  ), plugin );
 
         if ( config != null )
         {
