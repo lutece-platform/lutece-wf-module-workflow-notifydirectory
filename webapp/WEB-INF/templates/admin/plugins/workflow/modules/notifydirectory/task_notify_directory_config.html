@@ -19,6 +19,11 @@
 				checked="checked"
 			</#if>
 		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_sms}
+		<input type="radio" name="notify" value="4" 
+			<#if config?exists && !config.notifyByEmail && !config.notifyBySms && config.notifyByMailingList>
+				checked="checked"
+			</#if>
+		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list}
 	</p>
  
 	<p>
@@ -26,18 +31,31 @@
 		<@combo name="id_directory"  items=list_directory default_value=config.idDirectory />
 		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}"/>
 	</p>
+	<#if mailing_list?exists>
+		<p id="mailing_list">
+			<label for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} * :</label>
+			<@combo name="id_mailing_list"  items=mailing_list default_value=config.idMailingList />
+		</p>
+		<br />
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}
+	</#if>
 	<#if list_entries_email_sms?exists>
 		<p id="entry_sms">
 		    <label for="position_entry_directory_sms">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms} * :</label>
 			<@combo name="position_entry_directory_sms" items=list_entries_email_sms default_value=config.positionEntryDirectorySms />&nbsp;
-			<br/><label>&nbsp;</label>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms_comment}
+			<br/>
+			<label>&nbsp;</label>
+			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms_comment}
 		 </p>
 	</#if>
 	<#if list_entries_email_sms?exists>
 		<p id="entry_email">
 			<label for="position_entry_directory_email">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email} * :</label>
 			<@combo name="position_entry_directory_email" items=list_entries_email_sms default_value=config.positionEntryDirectoryEmail />&nbsp;
-			<br/><label>&nbsp;</label>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email_comment}
+			<br/>
+			<label>&nbsp;</label>
+			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email_comment}
 		</p>
 	</#if>
 	<#if list_entries_user_guid?exists && is_user_attribute_ws_active>
@@ -254,6 +272,12 @@ $( document ).ready( function(  ) {
 		// SMS
 		$( '#entry_email' ).hide(  );
 		$( '#notify_by_user_guid' ).hide(  );
+		$( '#mailing_list' ).hide(  );
+	} else if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '4' ) {
+		// MAILING LIST
+		$( '#entry_sms' ).hide(  ); 
+		$( '#entry_email' ).hide(  );
+		$( '#notify_by_user_guid' ).hide(  );
 	} else {
 		if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '1' ) {
 			// EMAIL
@@ -263,6 +287,7 @@ $( document ).ready( function(  ) {
 		if ( $( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
 			$( '#entry_email' ).hide(  );
 		}
+		$( '#mailing_list' ).hide(  );
 	}
 	if ( !$( '#email_validation' ).is( ':checked' ) ) {
 		$( '#email' ).hide(  );
@@ -276,16 +301,24 @@ $( document ).ready( function(  ) {
 			if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
 				$( '#entry_email' ).show(  );
 			}
+			$( '#mailing_list' ).hide(  );
 		} else if ( $( this ).val(  ) == '2' ) {
 			$( '#entry_sms' ).show(  );
 			$( '#notify_by_user_guid' ).hide(  );
 			$( '#entry_email' ).hide(  );
-		} else {
+			$( '#mailing_list' ).hide(  );
+		} else if ( $( this ).val(  ) == '3' ) {
 			$( '#entry_sms' ).show(  );
 			$( '#notify_by_user_guid' ).show(  );
 			if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
 				$( '#entry_email' ).show(  );
 			}
+			$( '#entry_mailing_list' ).hide(  );
+		} else if ( $( this ).val(  ) == '4' ) {
+			$( '#entry_sms' ).hide(  );
+			$( '#notify_by_user_guid' ).hide(  );
+			$( '#entry_email' ).hide(  );
+			$( '#mailing_list' ).show(  );
 		}
 	} );
 	$( '#entry_user_guid select' ).change( function(  ) {

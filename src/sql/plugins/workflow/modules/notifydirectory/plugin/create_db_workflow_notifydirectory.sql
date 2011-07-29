@@ -16,6 +16,7 @@ CREATE TABLE task_notify_directory_cf(
   message long VARCHAR DEFAULT NULL,
   is_notify_by_email SMALLINT(6) NOT NULL DEFAULT 0,
   is_notify_by_sms SMALLINT(6) NOT NULL DEFAULT 0,
+  is_notify_by_mailing_list SMALLINT(6) NOT NULL DEFAULT 0,
   is_notify_by_user_guid SMALLINT(6) NOT NULL DEFAULT 0,
   is_email_validation SMALLINT(6) NOT NULL DEFAULT 0,
   id_state_after_validation INT DEFAULT NULL,
@@ -23,6 +24,7 @@ CREATE TABLE task_notify_directory_cf(
   message_validation long varchar DEFAULT NULL,
   period_validity INT DEFAULT NULL,
   recipients_bcc VARCHAR(255) DEFAULT '' NOT NULL,
+  id_mailing_list INT DEFAULT NULL,
   PRIMARY KEY  (id_task)
   );
 

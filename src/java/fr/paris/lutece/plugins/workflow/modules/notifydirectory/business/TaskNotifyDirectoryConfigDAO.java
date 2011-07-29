@@ -47,16 +47,16 @@ import java.util.List;
  */
 public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigDAO
 {
-    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc " +
+    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_mailing_list,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc,id_mailing_list " +
         "FROM task_notify_directory_cf  WHERE id_task=?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO task_notify_directory_cf( " +
-        "id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc)" +
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        "id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_mailing_list,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc,id_mailing_list)" +
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String SQL_QUERY_UPDATE = "UPDATE task_notify_directory_cf " +
-        " SET id_task = ?, id_directory = ?, position_directory_entry_email = ?, position_directory_entry_sms = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ?, is_notify_by_email = ?, is_notify_by_sms = ?, is_notify_by_user_guid = ?,is_email_validation = ?, id_state_after_validation = ?, label_link = ?, message_validation = ?, period_validity = ?, recipients_bcc = ? " +
+        " SET id_task = ?, id_directory = ?, position_directory_entry_email = ?, position_directory_entry_sms = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ?, is_notify_by_email = ?, is_notify_by_sms = ?, is_notify_by_mailing_list = ?, is_notify_by_user_guid = ?,is_email_validation = ?, id_state_after_validation = ?, label_link = ?, message_validation = ?, period_validity = ?, recipients_bcc = ?, id_mailing_list = ? " +
         " WHERE id_task = ? ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM task_notify_directory_cf WHERE id_task = ? ";
-    private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc " +
+    private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_mailing_list,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc,id_mailing_list " +
         "FROM task_notify_directory_cf";
 
     /**
@@ -78,6 +78,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getMessage(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyByEmail(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyBySms(  ) );
+        daoUtil.setBoolean( ++nPos, config.isNotifyByMailingList(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyByUserGuid(  ) );
         daoUtil.setBoolean( ++nPos, config.isEmailValidation(  ) );
         daoUtil.setInt( ++nPos, config.getIdStateAfterValidation(  ) );
@@ -85,6 +86,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getMessageValidation(  ) );
         daoUtil.setInt( ++nPos, config.getPeriodValidity(  ) );
         daoUtil.setString( ++nPos, config.getRecipientsBcc(  ) );
+        daoUtil.setInt( ++nPos, config.getIdMailingList(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
@@ -109,6 +111,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getMessage(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyByEmail(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyBySms(  ) );
+        daoUtil.setBoolean( ++nPos, config.isNotifyByMailingList(  ) );
         daoUtil.setBoolean( ++nPos, config.isNotifyByUserGuid(  ) );
         daoUtil.setBoolean( ++nPos, config.isEmailValidation(  ) );
         daoUtil.setInt( ++nPos, config.getIdStateAfterValidation(  ) );
@@ -116,6 +119,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getMessageValidation(  ) );
         daoUtil.setInt( ++nPos, config.getPeriodValidity(  ) );
         daoUtil.setString( ++nPos, config.getRecipientsBcc(  ) );
+        daoUtil.setInt( ++nPos, config.getIdMailingList(  ) );
 
         daoUtil.setInt( ++nPos, config.getIdTask(  ) );
         daoUtil.executeUpdate(  );
@@ -149,6 +153,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setMessage( daoUtil.getString( ++nPos ) );
             config.setNotifyByEmail( daoUtil.getBoolean( ++nPos ) );
             config.setNotifyBySms( daoUtil.getBoolean( ++nPos ) );
+            config.setNotifyByMailingList( daoUtil.getBoolean( ++nPos ) );
             config.setNotifyByUserGuid( daoUtil.getBoolean( ++nPos ) );
             config.setEmailValidation( daoUtil.getBoolean( ++nPos ) );
             config.setIdStateAfterValidation( daoUtil.getInt( ++nPos ) );
@@ -156,6 +161,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setMessageValidation( daoUtil.getString( ++nPos ) );
             config.setPeriodValidity( daoUtil.getInt( ++nPos ) );
             config.setRecipientsBcc( daoUtil.getString( ++nPos ) );
+            config.setIdMailingList( daoUtil.getInt( ++nPos ) );
         }
 
         daoUtil.free(  );
@@ -200,6 +206,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setMessage( daoUtil.getString( ++nPos ) );
             config.setNotifyByEmail( daoUtil.getBoolean( ++nPos ) );
             config.setNotifyBySms( daoUtil.getBoolean( ++nPos ) );
+            config.setNotifyByMailingList( daoUtil.getBoolean( ++nPos ) );
             config.setNotifyByUserGuid( daoUtil.getBoolean( ++nPos ) );
             config.setEmailValidation( daoUtil.getBoolean( ++nPos ) );
             config.setIdStateAfterValidation( daoUtil.getInt( ++nPos ) );
@@ -207,6 +214,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setMessageValidation( daoUtil.getString( ++nPos ) );
             config.setPeriodValidity( daoUtil.getInt( ++nPos ) );
             config.setRecipientsBcc( daoUtil.getString( ++nPos ) );
+            config.setIdMailingList( daoUtil.getInt( ++nPos ) );
             configList.add( config );
         }
 

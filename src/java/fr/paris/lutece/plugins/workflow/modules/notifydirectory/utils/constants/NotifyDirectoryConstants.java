@@ -61,6 +61,7 @@ public final class NotifyDirectoryConstants
     public static final String FIELD_TASK_ENTRY_DIRECTORY_SMS = "module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms";
     public static final String FIELD_TASK_ENTRY_DIRECTORY_EMAIL = "module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email";
     public static final String FIELD_TASK_ENTRY_DIRECTORY_USER_GUID = "module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid";
+    public static final String FIELD_MAILING_LIST = "module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list";
     public static final String FIELD_STATE = "module.workflow.notifydirectory.task_notify_directory_config.label_state";
     public static final String FIELD_MESSAGE_VALIDATION = "module.workflow.notifydirectory.task_notify_directory_config.label_message_validation";
     public static final String FIELD_LABEL_LINK = "module.workflow.notifydirectory.task_notify_directory_config.label_label_link";
@@ -98,6 +99,7 @@ public final class NotifyDirectoryConstants
     public static final String MARK_IS_USER_ATTRIBUTE_WS_ACTIVE = "is_user_attribute_ws_active";
     public static final String MARK_LIST_ENTRIES_USER_GUID = "list_entries_user_guid";
     public static final String MARK_MESSAGE_VALIDATION = "message_validation_success";
+    public static final String MARK_MAILING_LIST = "mailing_list";
 
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
@@ -118,6 +120,7 @@ public final class NotifyDirectoryConstants
     public static final String PARAMETER_PERIOD_VALIDTY = "period_validity";
     public static final String PARAMETER_IS_NOTIFY_BY_USER_GUID = "is_notify_by_user_guid";
     public static final String PARAMETER_RECIPIENTS_BCC = "recipients_bcc";
+    public static final String PARAMETER_ID_MAILING_LIST = "id_mailing_list";
 
     // TAGS
     public static final String TAG_A = "a";

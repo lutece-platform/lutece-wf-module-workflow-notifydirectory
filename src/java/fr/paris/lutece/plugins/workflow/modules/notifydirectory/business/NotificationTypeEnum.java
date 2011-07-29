@@ -42,7 +42,8 @@ package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 public enum NotificationTypeEnum
 {EMAIL( 1 ),
     SMS( 2 ),
-    EMAIL_SMS( 3 );
+    EMAIL_SMS( 3 ),
+    MAILING_LIST( 4 );
 
     private int _nId;
 

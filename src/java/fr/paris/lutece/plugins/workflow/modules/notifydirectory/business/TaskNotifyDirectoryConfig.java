@@ -51,6 +51,7 @@ public class TaskNotifyDirectoryConfig
     private String _strSenderName;
     private boolean _bIsNotifyByEmail;
     private boolean _bIsNotifyBySms;
+    private boolean _bIsNotifyByMailingList;
     private boolean _bIsNotifyByUserGuid;
     private boolean _bEmailValidation;
     private int _nIdStateAfterValidation;
@@ -58,6 +59,7 @@ public class TaskNotifyDirectoryConfig
     private String _strMessageValidation;
     private int _nPeriodValidity;
     private String _strRecipientsBcc;
+    private int _nIdMailingList;
 
     /**
      * Get the id task
@@ -240,6 +242,24 @@ public class TaskNotifyDirectoryConfig
     }
 
     /**
+     * Check if it is notify by MailingList
+     * @return true if notify by MailingList
+     */
+    public boolean isNotifyByMailingList(  )
+    {
+        return _bIsNotifyByMailingList;
+    }
+
+    /**
+     * Set true if notify by MailingList
+     * @param bIsNotifyByMailingList enable true if notify by Sms
+     */
+    public void setNotifyByMailingList( boolean bIsNotifyByMailingList )
+    {
+        _bIsNotifyByMailingList = bIsNotifyByMailingList;
+    }
+
+    /**
      * Set true if notify by user guid
      * @param bIsNotifyByUserGuid true if notify by user guid
      */
@@ -363,5 +383,23 @@ public class TaskNotifyDirectoryConfig
     public void setRecipientsBcc( String strRecipient )
     {
         _strRecipientsBcc = strRecipient;
+    }
+
+    /**
+     * Get the id mailing list
+     * @return the id mailing list
+     */
+    public int getIdMailingList(  )
+    {
+        return _nIdMailingList;
+    }
+
+    /**
+    * Set the id mailing list
+    * @param nIdMailingList the id mailing list
+    */
+    public void setIdMailingList( int nIdMailingList )
+    {
+        _nIdMailingList = nIdMailingList;
     }
 }

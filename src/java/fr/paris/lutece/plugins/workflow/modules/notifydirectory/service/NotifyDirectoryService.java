@@ -58,7 +58,9 @@ import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
 import fr.paris.lutece.portal.business.workflow.Action;
 import fr.paris.lutece.portal.business.workflow.State;
+import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
@@ -249,6 +251,20 @@ public final class NotifyDirectoryService
         }
 
         return refenreceListDirectories;
+    }
+
+    /**
+     * Get the mailing list
+     * @param request the HTTP request
+     * @return a ReferenceList
+     */
+    public ReferenceList getMailingList( HttpServletRequest request )
+    {
+        ReferenceList refMailingList = new ReferenceList(  );
+        refMailingList.addItem( DirectoryUtils.CONSTANT_ID_NULL, StringUtils.EMPTY );
+        refMailingList.addAll( AdminMailingListService.getMailingLists( AdminUserService.getAdminUser( request ) ) );
+
+        return refMailingList;
     }
 
     /**

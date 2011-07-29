@@ -47,8 +47,10 @@ import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNoti
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.portal.business.mailinglist.Recipient;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
+import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -61,6 +63,7 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -107,7 +110,7 @@ public class TaskNotifyDirectory extends Task
         int nIdDirectory = WorkflowUtils.convertStringToInt( strIdDirectory );
         int nIdState = DirectoryUtils.convertStringToInt( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_ID_STATE ) );
-        String emailValidation = request.getParameter( NotifyDirectoryConstants.PARAMETER_EMAIL_VALIDATION );
+        String strEmailValidation = request.getParameter( NotifyDirectoryConstants.PARAMETER_EMAIL_VALIDATION );
         String strMessageValidation = request.getParameter( NotifyDirectoryConstants.PARAMETER_MESSAGE_VALIDATION );
         String strLabelLink = request.getParameter( NotifyDirectoryConstants.PARAMETER_LABEL_LINK );
         int nPeriodValidity = DirectoryUtils.convertStringToInt( request.getParameter( 
@@ -115,73 +118,74 @@ public class TaskNotifyDirectory extends Task
         boolean bIsNotifyByUserGuid = StringUtils.isNotBlank( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_IS_NOTIFY_BY_USER_GUID ) );
         String strRecipientsBcc = request.getParameter( NotifyDirectoryConstants.PARAMETER_RECIPIENTS_BCC );
+        int nIdMailingList = DirectoryUtils.convertStringToInt( request.getParameter( 
+                    NotifyDirectoryConstants.PARAMETER_ID_MAILING_LIST ) );
 
+        String strApply = request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY );
         String strError = StringUtils.EMPTY;
 
-        if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nNotify == DirectoryUtils.CONSTANT_ID_NULL ) )
+        if ( StringUtils.isBlank( strApply ) )
         {
-            strError = NotifyDirectoryConstants.FIELD_NOTIFY;
-        }
-        else if ( nIdDirectory == WorkflowUtils.CONSTANT_ID_NULL )
-        {
-            strError = NotifyDirectoryConstants.FIELD_TASK_DIRECTORY;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nPositionEntryDirectorySms == WorkflowUtils.CONSTANT_ID_NULL ) &&
-                ( ( nNotify == NotificationTypeEnum.SMS.getId(  ) ) ||
-                ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_SMS;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nPositionEntryDirectoryEmail == WorkflowUtils.CONSTANT_ID_NULL ) && !bIsNotifyByUserGuid &&
-                ( ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) ) ||
-                ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_EMAIL;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( ( strSenderName == null ) || strSenderName.trim(  ).equals( WorkflowUtils.EMPTY_STRING ) ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_SENDER_NAME;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( ( strSubject == null ) || strSubject.trim(  ).equals( WorkflowUtils.EMPTY_STRING ) ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_SUBJECT;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( ( strMessage == null ) || strMessage.trim(  ).equals( WorkflowUtils.EMPTY_STRING ) ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_MESSAGE;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nIdState == WorkflowUtils.CONSTANT_ID_NULL ) && ( emailValidation != null ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_STATE;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( ( strMessageValidation == null ) ||
-                strMessageValidation.trim(  ).equals( WorkflowUtils.EMPTY_STRING ) ) && ( emailValidation != null ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_MESSAGE_VALIDATION;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( ( strLabelLink == null ) || strLabelLink.trim(  ).equals( WorkflowUtils.EMPTY_STRING ) ) &&
-                ( emailValidation != null ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_LABEL_LINK;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nPeriodValidity == WorkflowUtils.CONSTANT_ID_NULL ) && ( emailValidation != null ) )
-        {
-            strError = NotifyDirectoryConstants.FIELD_LABEL_PERIOD_VALIDITY;
-        }
-        else if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nPositionEntryDirectoryUserGuid == WorkflowUtils.CONSTANT_ID_NULL ) && bIsNotifyByUserGuid )
-        {
-            strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_USER_GUID;
+            if ( nIdDirectory == WorkflowUtils.CONSTANT_ID_NULL )
+            {
+                strError = NotifyDirectoryConstants.FIELD_TASK_DIRECTORY;
+            }
+            else if ( nNotify == DirectoryUtils.CONSTANT_ID_NULL )
+            {
+                strError = NotifyDirectoryConstants.FIELD_NOTIFY;
+            }
+            else if ( ( nPositionEntryDirectorySms == WorkflowUtils.CONSTANT_ID_NULL ) &&
+                    ( ( nNotify == NotificationTypeEnum.SMS.getId(  ) ) ||
+                    ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_SMS;
+            }
+            else if ( ( nPositionEntryDirectoryEmail == WorkflowUtils.CONSTANT_ID_NULL ) && !bIsNotifyByUserGuid &&
+                    ( ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) ) ||
+                    ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_EMAIL;
+            }
+            else if ( StringUtils.isBlank( strSenderName ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_SENDER_NAME;
+            }
+            else if ( StringUtils.isBlank( strSubject ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_SUBJECT;
+            }
+            else if ( StringUtils.isBlank( strMessage ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_MESSAGE;
+            }
+            else if ( ( nPositionEntryDirectoryUserGuid == WorkflowUtils.CONSTANT_ID_NULL ) && bIsNotifyByUserGuid )
+            {
+                strError = NotifyDirectoryConstants.FIELD_TASK_ENTRY_DIRECTORY_USER_GUID;
+            }
+            else if ( ( nNotify == NotificationTypeEnum.MAILING_LIST.getId(  ) ) &&
+                    ( nIdMailingList == WorkflowUtils.CONSTANT_ID_NULL ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_MAILING_LIST;
+            }
+            else if ( StringUtils.isNotBlank( strEmailValidation ) )
+            {
+                if ( nIdState == WorkflowUtils.CONSTANT_ID_NULL )
+                {
+                    strError = NotifyDirectoryConstants.FIELD_STATE;
+                }
+                else if ( StringUtils.isBlank( strMessageValidation ) )
+                {
+                    strError = NotifyDirectoryConstants.FIELD_MESSAGE_VALIDATION;
+                }
+                else if ( StringUtils.isBlank( strLabelLink ) )
+                {
+                    strError = NotifyDirectoryConstants.FIELD_LABEL_LINK;
+                }
+                else if ( nPeriodValidity == WorkflowUtils.CONSTANT_ID_NULL )
+                {
+                    strError = NotifyDirectoryConstants.FIELD_LABEL_PERIOD_VALIDITY;
+                }
+            }
         }
 
         if ( !strError.equals( WorkflowUtils.EMPTY_STRING ) )
@@ -192,8 +196,8 @@ public class TaskNotifyDirectory extends Task
                 tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
-        if ( ( request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY ) == null ) &&
-                ( nPositionEntryDirectorySms == nPositionEntryDirectoryEmail ) && !bIsNotifyByUserGuid )
+        if ( StringUtils.isBlank( strApply ) && ( nPositionEntryDirectorySms == nPositionEntryDirectoryEmail ) &&
+                !bIsNotifyByUserGuid )
         {
             Object[] tabRequiredFields = 
                 {
@@ -223,28 +227,39 @@ public class TaskNotifyDirectory extends Task
         config.setMessage( strMessage );
         config.setSenderName( strSenderName );
         config.setSubject( strSubject );
-        config.setEmailValidation( emailValidation != null );
+        config.setEmailValidation( strEmailValidation != null );
         config.setIdStateAfterValidation( nIdState );
         config.setLabelLink( strLabelLink );
         config.setMessageValidation( strMessageValidation );
         config.setPeriodValidity( nPeriodValidity );
-        config.setNotifyByUserGuid( bIsNotifyByUserGuid );
         config.setRecipientsBcc( StringUtils.isNotEmpty( strRecipientsBcc ) ? strRecipientsBcc : StringUtils.EMPTY );
+        config.setIdMailingList( nIdMailingList );
+
+        config.setNotifyByUserGuid( bIsNotifyByUserGuid );
 
         if ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) )
         {
             config.setNotifyByEmail( true );
             config.setNotifyBySms( false );
+            config.setNotifyByMailingList( false );
         }
         else if ( nNotify == NotificationTypeEnum.SMS.getId(  ) )
         {
             config.setNotifyByEmail( false );
             config.setNotifyBySms( true );
+            config.setNotifyByMailingList( false );
         }
         else if ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) )
         {
             config.setNotifyByEmail( true );
             config.setNotifyBySms( true );
+            config.setNotifyByMailingList( false );
+        }
+        else if ( nNotify == NotificationTypeEnum.MAILING_LIST.getId(  ) )
+        {
+            config.setNotifyByEmail( false );
+            config.setNotifyBySms( false );
+            config.setNotifyByMailingList( true );
         }
 
         if ( bCreate )
@@ -295,6 +310,7 @@ public class TaskNotifyDirectory extends Task
             WorkflowWebService.isUserAttributeWSActive(  ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
             notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
+        model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG, locale, model );
 
@@ -357,13 +373,14 @@ public class TaskNotifyDirectory extends Task
             HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                         TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
 
+            String strSubject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model )
+                                                  .getHtml(  );
+
             if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
             {
                 // Build the mail message                
                 MailService.sendMailHtml( strEmail, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
-                    strSenderEmail,
-                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
-                    t.getHtml(  ) );
+                    strSenderEmail, strSubject, t.getHtml(  ) );
             }
 
             if ( config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms ) )
@@ -371,18 +388,28 @@ public class TaskNotifyDirectory extends Task
                 // Build the sms message
                 HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                             TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
-                MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail,
-                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
+                MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail, strSubject,
                     tSMS.getHtml(  ) );
+            }
+
+            if ( config.isNotifyByMailingList(  ) )
+            {
+                Collection<Recipient> listRecipients = AdminMailingListService.getRecipients( config.getIdMailingList(  ) );
+
+                // Send Mail
+                for ( Recipient recipient : listRecipients )
+                {
+                    // Build the mail message
+                    MailService.sendMailHtml( recipient.getEmail(  ), config.getSenderName(  ), strSenderEmail,
+                        strSubject, t.getHtml(  ) );
+                }
             }
 
             // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
             if ( !config.isNotifyByEmail(  ) && StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) )
             {
                 MailService.sendMailHtml( null, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
-                    strSenderEmail,
-                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
-                    t.getHtml(  ) );
+                    strSenderEmail, strSubject, t.getHtml(  ) );
             }
         }
     }
