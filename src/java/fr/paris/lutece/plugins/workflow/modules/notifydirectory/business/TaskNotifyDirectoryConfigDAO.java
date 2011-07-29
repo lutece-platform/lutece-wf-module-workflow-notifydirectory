@@ -47,16 +47,16 @@ import java.util.List;
  */
 public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigDAO
 {
-    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity " +
+    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc " +
         "FROM task_notify_directory_cf  WHERE id_task=?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO task_notify_directory_cf( " +
-        "id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity)" +
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        "id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc)" +
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String SQL_QUERY_UPDATE = "UPDATE task_notify_directory_cf " +
-        " SET id_task = ?, id_directory = ?, position_directory_entry_email = ?, position_directory_entry_sms = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ?, is_notify_by_email = ?, is_notify_by_sms = ?, is_notify_by_user_guid = ?,is_email_validation = ?, id_state_after_validation = ?, label_link = ?, message_validation = ?, period_validity = ? " +
+        " SET id_task = ?, id_directory = ?, position_directory_entry_email = ?, position_directory_entry_sms = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ?, is_notify_by_email = ?, is_notify_by_sms = ?, is_notify_by_user_guid = ?,is_email_validation = ?, id_state_after_validation = ?, label_link = ?, message_validation = ?, period_validity = ?, recipients_bcc = ? " +
         " WHERE id_task = ? ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM task_notify_directory_cf WHERE id_task = ? ";
-    private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity " +
+    private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_bcc " +
         "FROM task_notify_directory_cf";
 
     /**
@@ -84,6 +84,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getLabelLink(  ) );
         daoUtil.setString( ++nPos, config.getMessageValidation(  ) );
         daoUtil.setInt( ++nPos, config.getPeriodValidity(  ) );
+        daoUtil.setString( ++nPos, config.getRecipientsBcc(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
@@ -114,6 +115,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.setString( ++nPos, config.getLabelLink(  ) );
         daoUtil.setString( ++nPos, config.getMessageValidation(  ) );
         daoUtil.setInt( ++nPos, config.getPeriodValidity(  ) );
+        daoUtil.setString( ++nPos, config.getRecipientsBcc(  ) );
 
         daoUtil.setInt( ++nPos, config.getIdTask(  ) );
         daoUtil.executeUpdate(  );
@@ -153,6 +155,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setLabelLink( daoUtil.getString( ++nPos ) );
             config.setMessageValidation( daoUtil.getString( ++nPos ) );
             config.setPeriodValidity( daoUtil.getInt( ++nPos ) );
+            config.setRecipientsBcc( daoUtil.getString( ++nPos ) );
         }
 
         daoUtil.free(  );
@@ -203,6 +206,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
             config.setLabelLink( daoUtil.getString( ++nPos ) );
             config.setMessageValidation( daoUtil.getString( ++nPos ) );
             config.setPeriodValidity( daoUtil.getInt( ++nPos ) );
+            config.setRecipientsBcc( daoUtil.getString( ++nPos ) );
             configList.add( config );
         }
 

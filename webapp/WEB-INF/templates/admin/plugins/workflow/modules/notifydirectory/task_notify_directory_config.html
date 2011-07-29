@@ -70,9 +70,22 @@
 	    	<input type="text" name="sender_name" id="" size="80" value="${config.senderName}"  maxlength="255"/>
 	    <#else>
 	    	<input type="text" name="sender_name" id="" size="80" value="${default_sender_name}"  maxlength="255"/>
-	    </#if>		
-		<br/><label>&nbsp;</label>
+	    </#if>
+		<br/>
+		<label>&nbsp;</label>
 		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name_comment}
+	</p>
+	
+	<p>
+		<label for="recipients_bcc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc} :</label>
+		<#if config?exists && config.recipientsBcc?has_content>
+	    	<input type="text" name="recipients_bcc" id="" size="80" value="${config.recipientsBcc}"  maxlength="255"/>
+	    <#else>
+	    	<input type="text" name="recipients_bcc" id="" size="80" value=""  maxlength="255"/>
+	    </#if>
+	    <br/>
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc_comment}
 	</p>
 
   	<p>
@@ -81,7 +94,7 @@
 	    	<input type="text" name="subject" id="" size="80" value="${config.subject}"  maxlength="255"/>
 	    <#else>
 	    	<input type="text" name="subject" id="" size="80" value=""  maxlength="255"/>
-	    </#if>		
+	    </#if>
 		<br/>
 		<label>&nbsp;</label>
 		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject_comment}

@@ -114,6 +114,7 @@ public class TaskNotifyDirectory extends Task
                     NotifyDirectoryConstants.PARAMETER_PERIOD_VALIDTY ) );
         boolean bIsNotifyByUserGuid = StringUtils.isNotBlank( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_IS_NOTIFY_BY_USER_GUID ) );
+        String strRecipientsBcc = request.getParameter( NotifyDirectoryConstants.PARAMETER_RECIPIENTS_BCC );
 
         String strError = StringUtils.EMPTY;
 
@@ -228,6 +229,7 @@ public class TaskNotifyDirectory extends Task
         config.setMessageValidation( strMessageValidation );
         config.setPeriodValidity( nPeriodValidity );
         config.setNotifyByUserGuid( bIsNotifyByUserGuid );
+        config.setRecipientsBcc( StringUtils.isNotEmpty( strRecipientsBcc ) ? strRecipientsBcc : StringUtils.EMPTY );
 
         if ( nNotify == NotificationTypeEnum.EMAIL.getId(  ) )
         {
@@ -357,8 +359,9 @@ public class TaskNotifyDirectory extends Task
 
             if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
             {
-                // Build the mail message
-                MailService.sendMailHtml( strEmail, config.getSenderName(  ), strSenderEmail,
+                // Build the mail message                
+                MailService.sendMailHtml( strEmail, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
+                    strSenderEmail,
                     AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
                     t.getHtml(  ) );
             }
@@ -371,6 +374,15 @@ public class TaskNotifyDirectory extends Task
                 MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail,
                     AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
                     tSMS.getHtml(  ) );
+            }
+
+            // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
+            if ( !config.isNotifyByEmail(  ) && StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) )
+            {
+                MailService.sendMailHtml( null, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
+                    strSenderEmail,
+                    AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model ).getHtml(  ),
+                    t.getHtml(  ) );
             }
         }
     }

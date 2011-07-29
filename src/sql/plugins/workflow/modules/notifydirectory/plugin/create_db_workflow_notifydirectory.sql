@@ -22,6 +22,7 @@ CREATE TABLE task_notify_directory_cf(
   label_link VARCHAR(255) DEFAULT NULL, 
   message_validation long varchar DEFAULT NULL,
   period_validity INT DEFAULT NULL,
+  recipients_bcc VARCHAR(255) DEFAULT '' NOT NULL,
   PRIMARY KEY  (id_task)
   );
 
