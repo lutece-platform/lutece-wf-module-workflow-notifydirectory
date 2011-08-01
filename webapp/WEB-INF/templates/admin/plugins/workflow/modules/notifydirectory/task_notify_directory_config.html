@@ -1,4 +1,19 @@
 <#include "/admin/util/editor/editor.html" />
+
+<#assign id_directory = -1>
+<#assign id_mailing_list = -1>
+<#assign position_entry_directory_sms = -1>
+<#assign position_entry_directory_email = -1>
+<#assign position_entry_directory_user_guid = -1>
+<#assign id_state_after_validation = -1>
+<#if config?exists>
+	<#assign id_directory = config.idDirectory>
+	<#assign id_mailing_list = config.idMailingList>
+	<#assign position_entry_directory_sms = config.positionEntryDirectorySms>
+	<#assign position_entry_directory_email = config.positionEntryDirectoryEmail>
+	<#assign position_entry_directory_user_guid = config.positionEntryDirectoryUserGuid>
+	<#assign id_state_after_validation = config.idStateAfterValidation>
+</#if>
 <h2> #i18n{module.workflow.notifydirectory.task_notify_directory_config.title}</h2>
 <div class="highlight-box">
 	<br />
@@ -28,13 +43,13 @@
  
 	<p>
 	   	<label for="id_directory">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_directory} * :</label>
-		<@combo name="id_directory"  items=list_directory default_value=config.idDirectory />
+		<@combo name="id_directory" items=list_directory default_value=id_directory />
 		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}"/>
 	</p>
 	<#if mailing_list?exists>
 		<p id="mailing_list">
 			<label for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} * :</label>
-			<@combo name="id_mailing_list"  items=mailing_list default_value=config.idMailingList />
+			<@combo name="id_mailing_list"  items=mailing_list default_value=id_mailing_list />
 		</p>
 		<br />
 		<label>&nbsp;</label>
@@ -43,7 +58,7 @@
 	<#if list_entries_email_sms?exists>
 		<p id="entry_sms">
 		    <label for="position_entry_directory_sms">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms} * :</label>
-			<@combo name="position_entry_directory_sms" items=list_entries_email_sms default_value=config.positionEntryDirectorySms />&nbsp;
+			<@combo name="position_entry_directory_sms" items=list_entries_email_sms default_value=position_entry_directory_sms />&nbsp;
 			<br/>
 			<label>&nbsp;</label>
 			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms_comment}
@@ -52,7 +67,7 @@
 	<#if list_entries_email_sms?exists>
 		<p id="entry_email">
 			<label for="position_entry_directory_email">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email} * :</label>
-			<@combo name="position_entry_directory_email" items=list_entries_email_sms default_value=config.positionEntryDirectoryEmail />&nbsp;
+			<@combo name="position_entry_directory_email" items=list_entries_email_sms default_value=position_entry_directory_email />&nbsp;
 			<br/>
 			<label>&nbsp;</label>
 			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email_comment}
@@ -72,7 +87,7 @@
 		</p>
 		<p id="entry_user_guid">
 			<label for="position_entry_directory_user_guid">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid} :</label>
-			<@combo name="position_entry_directory_user_guid" items=list_entries_user_guid default_value=config.positionEntryDirectoryUserGuid />&nbsp;
+			<@combo name="position_entry_directory_user_guid" items=list_entries_user_guid default_value=position_entry_directory_user_guid />&nbsp;
 			<br/>
 			<label>&nbsp;</label>
 			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid_comment}
@@ -233,7 +248,7 @@
 		</p>
 		<p>
 			<label for="id_state">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state} * :</label>
-			<@combo name="id_state"  items=list_state default_value=config.idStateAfterValidation />
+			<@combo name="id_state"  items=list_state default_value=id_state_after_validation />
 			<br/><label>&nbsp;</label>
 			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state_comment}
 		</p>
