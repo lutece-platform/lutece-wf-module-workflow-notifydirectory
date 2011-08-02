@@ -58,6 +58,7 @@ public class TaskNotifyDirectoryConfig
     private String _strLabelLink;
     private String _strMessageValidation;
     private int _nPeriodValidity;
+    private String _strRecipientsCc;
     private String _strRecipientsBcc;
     private int _nIdMailingList;
 
@@ -365,6 +366,24 @@ public class TaskNotifyDirectoryConfig
     public void setPeriodValidity( int nPeriodValidity )
     {
         _nPeriodValidity = nPeriodValidity;
+    }
+
+    /**
+     * Returns the Recipient
+     * @return The Recipient
+     */
+    public String getRecipientsCc(  )
+    {
+        return _strRecipientsCc;
+    }
+
+    /**
+     * Sets the Recipient
+     * @param strRecipient The Recipient
+     */
+    public void setRecipientsCc( String strRecipient )
+    {
+        _strRecipientsCc = strRecipient;
     }
 
     /**

@@ -117,6 +117,7 @@ public class TaskNotifyDirectory extends Task
                     NotifyDirectoryConstants.PARAMETER_PERIOD_VALIDTY ) );
         boolean bIsNotifyByUserGuid = StringUtils.isNotBlank( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_IS_NOTIFY_BY_USER_GUID ) );
+        String strRecipientsCc = request.getParameter( NotifyDirectoryConstants.PARAMETER_RECIPIENTS_CC );
         String strRecipientsBcc = request.getParameter( NotifyDirectoryConstants.PARAMETER_RECIPIENTS_BCC );
         int nIdMailingList = DirectoryUtils.convertStringToInt( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_ID_MAILING_LIST ) );
@@ -197,7 +198,7 @@ public class TaskNotifyDirectory extends Task
         }
 
         if ( StringUtils.isBlank( strApply ) && ( nPositionEntryDirectorySms == nPositionEntryDirectoryEmail ) &&
-                !bIsNotifyByUserGuid )
+                !bIsNotifyByUserGuid && ( nNotify == NotificationTypeEnum.EMAIL_SMS.getId(  ) ) )
         {
             Object[] tabRequiredFields = 
                 {
@@ -232,6 +233,7 @@ public class TaskNotifyDirectory extends Task
         config.setLabelLink( strLabelLink );
         config.setMessageValidation( strMessageValidation );
         config.setPeriodValidity( nPeriodValidity );
+        config.setRecipientsCc( StringUtils.isNotEmpty( strRecipientsCc ) ? strRecipientsCc : StringUtils.EMPTY );
         config.setRecipientsBcc( StringUtils.isNotEmpty( strRecipientsBcc ) ? strRecipientsBcc : StringUtils.EMPTY );
         config.setIdMailingList( nIdMailingList );
 
@@ -379,8 +381,8 @@ public class TaskNotifyDirectory extends Task
             if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
             {
                 // Build the mail message                
-                MailService.sendMailHtml( strEmail, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
-                    strSenderEmail, strSubject, t.getHtml(  ) );
+                MailService.sendMailHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, t.getHtml(  ) );
             }
 
             if ( config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms ) )
@@ -406,10 +408,12 @@ public class TaskNotifyDirectory extends Task
             }
 
             // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
-            if ( !config.isNotifyByEmail(  ) && StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) )
+            if ( !config.isNotifyByEmail(  ) &&
+                    ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
+                    StringUtils.isNotBlank( config.getRecipientsCc(  ) ) ) )
             {
-                MailService.sendMailHtml( null, null, config.getRecipientsBcc(  ), config.getSenderName(  ),
-                    strSenderEmail, strSubject, t.getHtml(  ) );
+                MailService.sendMailHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, t.getHtml(  ) );
             }
         }
     }

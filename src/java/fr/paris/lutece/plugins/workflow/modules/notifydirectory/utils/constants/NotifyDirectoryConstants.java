@@ -119,6 +119,7 @@ public final class NotifyDirectoryConstants
     public static final String PARAMETER_LABEL_LINK = "label_link";
     public static final String PARAMETER_PERIOD_VALIDTY = "period_validity";
     public static final String PARAMETER_IS_NOTIFY_BY_USER_GUID = "is_notify_by_user_guid";
+    public static final String PARAMETER_RECIPIENTS_CC = "recipients_cc";
     public static final String PARAMETER_RECIPIENTS_BCC = "recipients_bcc";
     public static final String PARAMETER_ID_MAILING_LIST = "id_mailing_list";
 

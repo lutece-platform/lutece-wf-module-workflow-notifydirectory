@@ -50,10 +50,10 @@
 		<p id="mailing_list">
 			<label for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} * :</label>
 			<@combo name="id_mailing_list"  items=mailing_list default_value=id_mailing_list />
+			<br />
+			<label>&nbsp;</label>
+			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}
 		</p>
-		<br />
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}
 	</#if>
 	<#if list_entries_email_sms?exists>
 		<p id="entry_sms">
@@ -100,9 +100,9 @@
 	<p>
     	<label for="sender_name">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name} * :</label>
 		<#if config?exists && config.senderName?has_content>
-	    	<input type="text" name="sender_name" id="" size="80" value="${config.senderName}"  maxlength="255"/>
+	    	<input type="text" name="sender_name" id="" size="80" value="${config.senderName}" maxlength="255"/>
 	    <#else>
-	    	<input type="text" name="sender_name" id="" size="80" value="${default_sender_name}"  maxlength="255"/>
+	    	<input type="text" name="sender_name" id="" size="80" value="${default_sender_name}" maxlength="255"/>
 	    </#if>
 		<br/>
 		<label>&nbsp;</label>
@@ -110,11 +110,23 @@
 	</p>
 	
 	<p>
+		<label for="recipients_cc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc} :</label>
+		<#if config?exists && config.recipientsCc?has_content>
+	    	<input type="text" name="recipients_cc" id="" size="80" value="${config.recipientsCc}"  maxlength="255"/>
+	    <#else>
+	    	<input type="text" name="recipients_cc" id="" size="80" value="" maxlength="255"/>
+	    </#if>
+	    <br/>
+		<label>&nbsp;</label>
+		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc_comment}
+	</p>
+	
+	<p>
 		<label for="recipients_bcc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc} :</label>
 		<#if config?exists && config.recipientsBcc?has_content>
 	    	<input type="text" name="recipients_bcc" id="" size="80" value="${config.recipientsBcc}"  maxlength="255"/>
 	    <#else>
-	    	<input type="text" name="recipients_bcc" id="" size="80" value=""  maxlength="255"/>
+	    	<input type="text" name="recipients_bcc" id="" size="80" value="" maxlength="255"/>
 	    </#if>
 	    <br/>
 		<label>&nbsp;</label>
@@ -124,9 +136,9 @@
   	<p>
     	<label for="suject">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject} * :</label>
 	    <#if config?exists && config.subject?has_content>
-	    	<input type="text" name="subject" id="" size="80" value="${config.subject}"  maxlength="255"/>
+	    	<input type="text" name="subject" id="" size="80" value="${config.subject}" maxlength="255"/>
 	    <#else>
-	    	<input type="text" name="subject" id="" size="80" value=""  maxlength="255"/>
+	    	<input type="text" name="subject" id="" size="80" value="" maxlength="255"/>
 	    </#if>
 		<br/>
 		<label>&nbsp;</label>
