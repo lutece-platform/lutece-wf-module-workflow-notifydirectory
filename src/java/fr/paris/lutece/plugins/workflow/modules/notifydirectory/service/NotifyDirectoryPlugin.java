@@ -43,7 +43,7 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
  */
 public class NotifyDirectoryPlugin extends PluginDefaultImplementation
 {
-    public static final String PLUGIN_NAME = "notifydirectory";
+    public static final String PLUGIN_NAME = "workflow-notifydirectory";
 
     /**
      * Initialise the exporttoentrydirectory
