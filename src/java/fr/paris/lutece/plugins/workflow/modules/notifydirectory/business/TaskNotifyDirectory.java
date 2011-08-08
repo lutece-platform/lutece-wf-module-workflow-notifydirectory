@@ -46,12 +46,10 @@ import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDi
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
+import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
-import fr.paris.lutece.portal.business.mailinglist.Recipient;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
-import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -64,7 +62,6 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -311,7 +308,7 @@ public class TaskNotifyDirectory extends Task
         model.put( NotifyDirectoryConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyDirectoryConstants.MARK_LOCALE, request.getLocale(  ) );
         model.put( NotifyDirectoryConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE,
-            WorkflowWebService.isUserAttributeWSActive(  ) );
+            WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
             notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
         model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
@@ -358,67 +355,58 @@ public class TaskNotifyDirectory extends Task
 
             // Record
             Record record = RecordHome.findByPrimaryKey( resourceHistory.getIdResource(  ), pluginDirectory );
-            Directory directory = DirectoryHome.findByPrimaryKey( record.getDirectory(  ).getIdDirectory(  ),
-                    pluginDirectory );
-            record.setDirectory( directory );
 
-            // Get email
-            String strEmail = notifyDirectoryService.getEmail( config, record.getIdRecord(  ),
-                    directory.getIdDirectory(  ) );
-
-            // Get Sms
-            String strSms = notifyDirectoryService.getSMSPhoneNumber( config, record.getIdRecord(  ),
-                    directory.getIdDirectory(  ) );
-            String strServerSms = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_SERVER_SMS );
-
-            // Get sender email
-            String strSenderEmail = MailService.getNoReplyEmail(  );
-
-            Map<String, String> model = notifyDirectoryService.fillModel( config, resourceHistory, record, directory,
-                    request, getAction(  ).getId(  ), nIdResourceHistory );
-
-            HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                        TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
-
-            String strSubject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale, model )
-                                                  .getHtml(  );
-
-            if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
+            if ( record != null )
             {
-                // Build the mail message                
-                MailService.sendMailHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
-                    config.getSenderName(  ), strSenderEmail, strSubject, t.getHtml(  ) );
-            }
+                Directory directory = DirectoryHome.findByPrimaryKey( record.getDirectory(  ).getIdDirectory(  ),
+                        pluginDirectory );
 
-            if ( config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms ) )
-            {
-                // Build the sms message
-                HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                            TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
-                MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail, strSubject,
-                    tSMS.getHtml(  ) );
-            }
-
-            if ( config.isNotifyByMailingList(  ) )
-            {
-                Collection<Recipient> listRecipients = AdminMailingListService.getRecipients( config.getIdMailingList(  ) );
-
-                // Send Mail
-                for ( Recipient recipient : listRecipients )
+                if ( directory != null )
                 {
-                    // Build the mail message
-                    MailService.sendMailHtml( recipient.getEmail(  ), config.getSenderName(  ), strSenderEmail,
-                        strSubject, t.getHtml(  ) );
-                }
-            }
+                    record.setDirectory( directory );
 
-            // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
-            if ( !config.isNotifyByEmail(  ) &&
-                    ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
-                    StringUtils.isNotBlank( config.getRecipientsCc(  ) ) ) )
-            {
-                MailService.sendMailHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
-                    config.getSenderName(  ), strSenderEmail, strSubject, t.getHtml(  ) );
+                    // Get email
+                    String strEmail = notifyDirectoryService.getEmail( config, record.getIdRecord(  ),
+                            directory.getIdDirectory(  ) );
+                    String strEmailContent = StringUtils.EMPTY;
+
+                    // Get Sms
+                    String strSms = notifyDirectoryService.getSMSPhoneNumber( config, record.getIdRecord(  ),
+                            directory.getIdDirectory(  ) );
+                    String strSmsContent = StringUtils.EMPTY;
+
+                    // Get sender email
+                    String strSenderEmail = MailService.getNoReplyEmail(  );
+
+                    Map<String, Object> model = notifyDirectoryService.fillModel( config, resourceHistory, record,
+                            directory, request, getAction(  ).getId(  ), nIdResourceHistory );
+
+                    String strSubject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale,
+                            model ).getHtml(  );
+
+                    boolean bIsNotifyByEmail = config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail );
+                    boolean bIsNotifyBySms = config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms );
+                    boolean bIsNotifyByMailingList = config.isNotifyByMailingList(  );
+                    boolean bHasRecipients = ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
+                        StringUtils.isNotBlank( config.getRecipientsCc(  ) ) );
+
+                    if ( bIsNotifyByEmail || bIsNotifyByMailingList || bHasRecipients )
+                    {
+                        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+                                    TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
+                        strEmailContent = t.getHtml(  );
+                    }
+
+                    if ( bIsNotifyBySms )
+                    {
+                        HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
+                                    TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
+                        strSmsContent = tSMS.toString(  );
+                    }
+
+                    notifyDirectoryService.sendMessage( config, strEmail, strSms, strSenderEmail, strSubject,
+                        strEmailContent, strSmsContent );
+                }
             }
         }
     }

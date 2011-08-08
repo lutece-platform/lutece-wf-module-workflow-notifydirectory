@@ -57,13 +57,15 @@ import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNot
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
+import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
+import fr.paris.lutece.portal.business.mailinglist.Recipient;
 import fr.paris.lutece.portal.business.workflow.Action;
 import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -83,6 +85,7 @@ import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -386,8 +389,9 @@ public final class NotifyDirectoryService
             {
                 String strUserGuid = getRecordFieldValue( config.getPositionEntryDirectoryUserGuid(  ), nIdRecord,
                         nIdDirectory );
-                strEmail = WorkflowWebService.getService(  )
-                                             .getUserAttribute( strUserGuid, LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
+                strEmail = WorkflowUserAttributesManager.getManager(  )
+                                                        .getAttribute( strUserGuid,
+                        LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
             }
             else
             {
@@ -464,6 +468,56 @@ public final class NotifyDirectoryService
     }
 
     /**
+     * Send the message
+     * @param config the config
+     * @param strEmail the email
+     * @param strSms the sms
+     * @param strSenderEmail the sender email
+     * @param strSubject the subject
+     * @param strEmailContent the email content
+     * @param strSMSContent the sms content
+     */
+    public void sendMessage( TaskNotifyDirectoryConfig config, String strEmail, String strSms, String strSenderEmail,
+        String strSubject, String strEmailContent, String strSMSContent )
+    {
+        if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
+        {
+            // Build the mail message                
+            MailService.sendMailHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+        }
+
+        if ( config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms ) )
+        {
+            String strServerSms = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_SERVER_SMS );
+            MailService.sendMailHtml( strSms + strServerSms, config.getSenderName(  ), strSenderEmail, strSubject,
+                strSMSContent );
+        }
+
+        if ( config.isNotifyByMailingList(  ) )
+        {
+            Collection<Recipient> listRecipients = AdminMailingListService.getRecipients( config.getIdMailingList(  ) );
+
+            // Send Mail
+            for ( Recipient recipient : listRecipients )
+            {
+                // Build the mail message
+                MailService.sendMailHtml( recipient.getEmail(  ), config.getSenderName(  ), strSenderEmail, strSubject,
+                    strEmailContent );
+            }
+        }
+
+        // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
+        if ( !config.isNotifyByEmail(  ) &&
+                ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
+                StringUtils.isNotBlank( config.getRecipientsCc(  ) ) ) )
+        {
+            MailService.sendMailHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+        }
+    }
+
+    /**
      * Fill the model
      * @param config the config
      * @param resourceHistory the resource history
@@ -474,11 +528,11 @@ public final class NotifyDirectoryService
      * @param nIdHistory the id history
      * @return the model
      */
-    public Map<String, String> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
+    public Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
         Record record, Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        Map<String, String> model = new HashMap<String, String>(  );
+        Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
 
         //Directory directory = DirectoryHome.findByPrimaryKey( config.getIdDirectory(  ), pluginDirectory );
@@ -581,10 +635,10 @@ public final class NotifyDirectoryService
         model.put( NotifyDirectoryConstants.MARK_LINK, linkHtml );
 
         // Fill user attributes
-        if ( WorkflowWebService.isUserAttributeWSActive(  ) )
+        if ( directory != null )
         {
             String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
-            WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strUserGuid );
+            fillModelWithUserAttributes( model, strUserGuid );
         }
 
         // Fill the model with the info of other tasks
@@ -595,6 +649,33 @@ public final class NotifyDirectoryService
         }
 
         return model;
+    }
+
+    /**
+     * Fills the model with user attributes
+     * @param model the model
+     * @param strUserGuid the user guid
+     */
+    private void fillModelWithUserAttributes( Map<String, Object> model, String strUserGuid )
+    {
+        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) )
+        {
+            Map<String, String> mapUserAttributes = WorkflowUserAttributesManager.getManager(  )
+                                                                                 .getAttributes( strUserGuid );
+            String strFirstName = mapUserAttributes.get( LuteceUser.NAME_GIVEN );
+            String strLastName = mapUserAttributes.get( LuteceUser.NAME_FAMILY );
+            String strEmail = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
+            String strPhoneNumber = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_TELECOM_TELEPHONE_NUMBER );
+
+            model.put( NotifyDirectoryConstants.MARK_FIRST_NAME,
+                StringUtils.isNotEmpty( strFirstName ) ? strFirstName : StringUtils.EMPTY );
+            model.put( NotifyDirectoryConstants.MARK_LAST_NAME,
+                StringUtils.isNotEmpty( strLastName ) ? strLastName : StringUtils.EMPTY );
+            model.put( NotifyDirectoryConstants.MARK_EMAIL,
+                StringUtils.isNotEmpty( strEmail ) ? strEmail : StringUtils.EMPTY );
+            model.put( NotifyDirectoryConstants.MARK_PHONE_NUMBER,
+                StringUtils.isNotEmpty( strPhoneNumber ) ? strPhoneNumber : StringUtils.EMPTY );
+        }
     }
 
     /**

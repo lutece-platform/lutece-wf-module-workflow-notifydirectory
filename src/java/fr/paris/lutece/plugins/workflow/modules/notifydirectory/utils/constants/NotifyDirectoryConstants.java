@@ -103,6 +103,10 @@ public final class NotifyDirectoryConstants
     public static final String MARK_PLUGIN_WORKFLOW = "plugin_workflow";
     public static final String MARK_TASKS_LIST = "tasks_list";
     public static final String MARK_TASK = "task_";
+    public static final String MARK_FIRST_NAME = "first_name";
+    public static final String MARK_LAST_NAME = "last_name";
+    public static final String MARK_EMAIL = "email";
+    public static final String MARK_PHONE_NUMBER = "phone_number";
 
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
