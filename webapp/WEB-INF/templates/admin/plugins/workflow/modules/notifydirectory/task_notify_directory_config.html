@@ -210,6 +210,26 @@
 			</fieldset>
 			<br />
 		</#if>
+		<#if tasks_list?exists && tasks_list?has_content>
+			<fieldset>
+				<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_tasks_list_comment}</legend>
+				<table>
+					<tr>
+						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_title}</th>
+						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_type}</th>
+						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
+					</tr>
+					<#list tasks_list as task>
+						<tr>
+							<td>${task.getTitle( plugin_workflow, locale )}</td>
+							<td>${task.taskType.title}</td>
+							<td>&#36;&#123;task_${task.id}&#125;</td>
+						</tr>
+					</#list>
+				</table>
+			</fieldset>
+			<br />
+		</#if>
 		<fieldset>
 			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_directory_comment}</legend>
 			<table>

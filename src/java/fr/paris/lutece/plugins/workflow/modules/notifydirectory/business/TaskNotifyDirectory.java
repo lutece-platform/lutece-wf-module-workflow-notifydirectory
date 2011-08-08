@@ -45,6 +45,7 @@ import fr.paris.lutece.plugins.workflow.business.task.Task;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
+import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.portal.business.mailinglist.Recipient;
@@ -294,6 +295,7 @@ public class TaskNotifyDirectory extends Task
         TaskNotifyDirectoryConfigService configService = TaskNotifyDirectoryConfigService.getService(  );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME );
+        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
 
@@ -313,6 +315,9 @@ public class TaskNotifyDirectory extends Task
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
             notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
         model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
+        model.put( NotifyDirectoryConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
+        model.put( NotifyDirectoryConstants.MARK_TASKS_LIST,
+            notifyDirectoryService.getListTasks( getAction(  ).getId(  ), locale ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG, locale, model );
 
@@ -370,7 +375,7 @@ public class TaskNotifyDirectory extends Task
             String strSenderEmail = MailService.getNoReplyEmail(  );
 
             Map<String, String> model = notifyDirectoryService.fillModel( config, resourceHistory, record, directory,
-                    request );
+                    request, getAction(  ).getId(  ), nIdResourceHistory );
 
             HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
                         TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );

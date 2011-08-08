@@ -49,6 +49,8 @@ import fr.paris.lutece.plugins.workflow.business.ActionHome;
 import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
 import fr.paris.lutece.plugins.workflow.business.StateFilter;
 import fr.paris.lutece.plugins.workflow.business.StateHome;
+import fr.paris.lutece.plugins.workflow.business.task.ITask;
+import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
@@ -56,6 +58,8 @@ import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNot
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.WorkflowWebService;
+import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
+import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
 import fr.paris.lutece.portal.business.workflow.Action;
 import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
@@ -433,16 +437,45 @@ public final class NotifyDirectoryService
     }
 
     /**
+     * Get the list of tasks
+     * @param nIdAction the id action
+     * @param locale the locale
+     * @return a list of {@link ITask}
+     */
+    public List<ITask> getListTasks( int nIdAction, Locale locale )
+    {
+        List<ITask> listTasks = new ArrayList<ITask>(  );
+        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
+
+        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
+        {
+            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
+            {
+                if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
+                {
+                    listTasks.add( task );
+
+                    break;
+                }
+            }
+        }
+
+        return listTasks;
+    }
+
+    /**
      * Fill the model
      * @param config the config
      * @param resourceHistory the resource history
      * @param record the record
      * @param directory the directory
-         * @param request the HTTP request
+     * @param request the HTTP request
+     * @param nIdAction the id action
+     * @param nIdHistory the id history
      * @return the model
      */
     public Map<String, String> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
-        Record record, Directory directory, HttpServletRequest request )
+        Record record, Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Map<String, String> model = new HashMap<String, String>(  );
@@ -552,6 +585,13 @@ public final class NotifyDirectoryService
         {
             String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
             WorkflowWebService.getService(  ).fillUserAttributesToModel( model, strUserGuid );
+        }
+
+        // Fill the model with the info of other tasks
+        for ( ITask task : getListTasks( nIdAction, request.getLocale(  ) ) )
+        {
+            model.put( NotifyDirectoryConstants.MARK_TASK + task.getId(  ),
+                TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
         }
 
         return model;

@@ -100,6 +100,9 @@ public final class NotifyDirectoryConstants
     public static final String MARK_LIST_ENTRIES_USER_GUID = "list_entries_user_guid";
     public static final String MARK_MESSAGE_VALIDATION = "message_validation_success";
     public static final String MARK_MAILING_LIST = "mailing_list";
+    public static final String MARK_PLUGIN_WORKFLOW = "plugin_workflow";
+    public static final String MARK_TASKS_LIST = "tasks_list";
+    public static final String MARK_TASK = "task_";
 
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
