@@ -133,33 +133,6 @@ public final class NotifyDirectoryService
             BEAN_NOTIFY_DIRECTORY_SERVICE );
     }
 
-    /**
-    * Fill the list of entry types
-    * @param strPropertyEntryTypes the property containing the entry types
-    * @return a list of integer
-    */
-    public static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )
-    {
-        List<Integer> listEntryTypes = new ArrayList<Integer>(  );
-        String strEntryTypes = AppPropertiesService.getProperty( strPropertyEntryTypes );
-
-        if ( StringUtils.isNotBlank( strEntryTypes ) )
-        {
-            String[] listAcceptEntryTypesForIdDemand = strEntryTypes.split( NotifyDirectoryConstants.COMMA );
-
-            for ( String strAcceptEntryType : listAcceptEntryTypesForIdDemand )
-            {
-                if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
-                {
-                    int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
-                    listEntryTypes.add( nAcceptedEntryType );
-                }
-            }
-        }
-
-        return listEntryTypes;
-    }
-
     // CHECKS
 
     /**
@@ -201,7 +174,7 @@ public final class NotifyDirectoryService
      * @param nIdEntryType the id entry type
      * @return true if it is refused, false otherwise
      */
-    private boolean isEntryTypeRefused( int nIdEntryType )
+    public boolean isEntryTypeRefused( int nIdEntryType )
     {
         boolean bIsRefused = true;
 
@@ -467,6 +440,8 @@ public final class NotifyDirectoryService
         return listTasks;
     }
 
+    // OTHERS
+
     /**
      * Send the message
      * @param config the config
@@ -531,6 +506,7 @@ public final class NotifyDirectoryService
     public Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
         Record record, Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
+        Locale locale = getLocale( request );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
@@ -549,8 +525,7 @@ public final class NotifyDirectoryService
 
         for ( RecordField recordField : listRecordField )
         {
-            String value = recordField.getEntry(  )
-                                      .convertRecordFieldValueToString( recordField, request.getLocale(  ), false, false );
+            String value = recordField.getEntry(  ).convertRecordFieldValueToString( recordField, locale, false, false );
 
             if ( isEntryTypeRefused( recordField.getEntry(  ).getEntryType(  ).getIdType(  ) ) )
             {
@@ -605,7 +580,7 @@ public final class NotifyDirectoryService
             resourceKey.setDateExpiry( new Timestamp( calendar.getTimeInMillis(  ) ) );
             ResourceKeyHome.create( resourceKey, pluginDirectory );
 
-            StringBuilder sbBaseUrl = new StringBuilder( AppPathService.getBaseUrl( request ) );
+            StringBuilder sbBaseUrl = new StringBuilder( getBaseUrl( request ) );
 
             if ( ( sbBaseUrl.length(  ) > 0 ) && !sbBaseUrl.toString(  ).endsWith( NotifyDirectoryConstants.SLASH ) )
             {
@@ -629,7 +604,7 @@ public final class NotifyDirectoryService
 
             Map<String, Object> modelTmp = new HashMap<String, Object>(  );
             modelTmp.put( NotifyDirectoryConstants.MARK_LINK, url.getUrl(  ) );
-            linkHtml = AppTemplateService.getTemplateFromStringFtl( linkHtml, request.getLocale(  ), modelTmp ).getHtml(  );
+            linkHtml = AppTemplateService.getTemplateFromStringFtl( linkHtml, locale, modelTmp ).getHtml(  );
         }
 
         model.put( NotifyDirectoryConstants.MARK_LINK, linkHtml );
@@ -642,13 +617,107 @@ public final class NotifyDirectoryService
         }
 
         // Fill the model with the info of other tasks
-        for ( ITask task : getListTasks( nIdAction, request.getLocale(  ) ) )
+        for ( ITask task : getListTasks( nIdAction, locale ) )
         {
             model.put( NotifyDirectoryConstants.MARK_TASK + task.getId(  ),
                 TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
         }
 
         return model;
+    }
+
+    // PRIVATE METHODS
+
+    /**
+     * Get the record field value
+     * @param nPosition the position of the entry
+     * @param nIdRecord the id record
+     * @param nIdDirectory the id directory
+     * @return the record field value
+     */
+    private String getRecordFieldValue( int nPosition, int nIdRecord, int nIdDirectory )
+    {
+        String strRecordFieldValue = StringUtils.EMPTY;
+        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+
+        // RecordField
+        EntryFilter entryFilter = new EntryFilter(  );
+        entryFilter.setPosition( nPosition );
+        entryFilter.setIdDirectory( nIdDirectory );
+
+        List<IEntry> listEntries = EntryHome.getEntryList( entryFilter, pluginDirectory );
+
+        if ( ( listEntries != null ) && !listEntries.isEmpty(  ) )
+        {
+            IEntry entry = listEntries.get( 0 );
+            RecordFieldFilter recordFieldFilterEmail = new RecordFieldFilter(  );
+            recordFieldFilterEmail.setIdDirectory( nIdDirectory );
+            recordFieldFilterEmail.setIdEntry( entry.getIdEntry(  ) );
+            recordFieldFilterEmail.setIdRecord( nIdRecord );
+
+            List<RecordField> listRecordFields = RecordFieldHome.getRecordFieldList( recordFieldFilterEmail,
+                    pluginDirectory );
+
+            if ( ( listRecordFields != null ) && !listRecordFields.isEmpty(  ) && ( listRecordFields.get( 0 ) != null ) )
+            {
+                RecordField recordFieldIdDemand = listRecordFields.get( 0 );
+                strRecordFieldValue = recordFieldIdDemand.getValue(  );
+
+                if ( recordFieldIdDemand.getField(  ) != null )
+                {
+                    strRecordFieldValue = recordFieldIdDemand.getField(  ).getTitle(  );
+                }
+            }
+        }
+
+        return strRecordFieldValue;
+    }
+
+    /**
+     * Get the base url
+     * @param request the HTTP request
+     * @return the base url
+     */
+    private String getBaseUrl( HttpServletRequest request )
+    {
+        String strBaseUrl = StringUtils.EMPTY;
+
+        if ( request != null )
+        {
+            strBaseUrl = AppPathService.getBaseUrl( request );
+        }
+        else
+        {
+            strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_BASE_URL );
+
+            if ( StringUtils.isBlank( strBaseUrl ) )
+            {
+                strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_PROD_URL );
+            }
+        }
+
+        return strBaseUrl;
+    }
+
+    /**
+     * Get the locale
+     * @param request the HTTP request
+     * @return the locale
+     */
+    private Locale getLocale( HttpServletRequest request )
+    {
+        Locale locale = null;
+
+        if ( request != null )
+        {
+            locale = request.getLocale(  );
+        }
+        else
+        {
+            locale = I18nService.getDefaultLocale(  );
+        }
+
+        return locale;
     }
 
     /**
@@ -699,47 +768,29 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the record field value
-     * @param nPosition the position of the entry
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
-     * @return the record field value
+     * Fill the list of entry types
+     * @param strPropertyEntryTypes the property containing the entry types
+     * @return a list of integer
      */
-    private String getRecordFieldValue( int nPosition, int nIdRecord, int nIdDirectory )
+    private static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )
     {
-        String strRecordFieldValue = StringUtils.EMPTY;
-        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+        List<Integer> listEntryTypes = new ArrayList<Integer>(  );
+        String strEntryTypes = AppPropertiesService.getProperty( strPropertyEntryTypes );
 
-        // RecordField
-        EntryFilter entryFilter = new EntryFilter(  );
-        entryFilter.setPosition( nPosition );
-        entryFilter.setIdDirectory( nIdDirectory );
-
-        List<IEntry> listEntries = EntryHome.getEntryList( entryFilter, pluginDirectory );
-
-        if ( ( listEntries != null ) && !listEntries.isEmpty(  ) )
+        if ( StringUtils.isNotBlank( strEntryTypes ) )
         {
-            IEntry entry = listEntries.get( 0 );
-            RecordFieldFilter recordFieldFilterEmail = new RecordFieldFilter(  );
-            recordFieldFilterEmail.setIdDirectory( nIdDirectory );
-            recordFieldFilterEmail.setIdEntry( entry.getIdEntry(  ) );
-            recordFieldFilterEmail.setIdRecord( nIdRecord );
+            String[] listAcceptEntryTypesForIdDemand = strEntryTypes.split( NotifyDirectoryConstants.COMMA );
 
-            List<RecordField> listRecordFields = RecordFieldHome.getRecordFieldList( recordFieldFilterEmail,
-                    pluginDirectory );
-
-            if ( ( listRecordFields != null ) && !listRecordFields.isEmpty(  ) && ( listRecordFields.get( 0 ) != null ) )
+            for ( String strAcceptEntryType : listAcceptEntryTypesForIdDemand )
             {
-                RecordField recordFieldIdDemand = listRecordFields.get( 0 );
-                strRecordFieldValue = recordFieldIdDemand.getValue(  );
-
-                if ( recordFieldIdDemand.getField(  ) != null )
+                if ( StringUtils.isNotBlank( strAcceptEntryType ) && StringUtils.isNumeric( strAcceptEntryType ) )
                 {
-                    strRecordFieldValue = recordFieldIdDemand.getField(  ).getTitle(  );
+                    int nAcceptedEntryType = Integer.parseInt( strAcceptEntryType );
+                    listEntryTypes.add( nAcceptedEntryType );
                 }
             }
         }
 
-        return strRecordFieldValue;
+        return listEntryTypes;
     }
 }

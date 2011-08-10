@@ -80,6 +80,8 @@ public final class NotifyDirectoryConstants
     public static final String PROPERTY_SERVER_SMS = "workflow-notifydirectory.email_server_sms";
     public static final String PROPERTY_XPAGE_PAGETITLE = "module.workflow.notifydirectory.xpage.pagetitle";
     public static final String PROPERTY_XPAGE_PATHLABEL = "module.workflow.notifydirectory.xpage.pathlabel";
+    public static final String PROPERTY_LUTECE_BASE_URL = "lutece.base.url";
+    public static final String PROPERTY_LUTECE_PROD_URL = "lutece.prod.url";
 
     // MARKS
     public static final String MARK_MESSAGE = "message";
