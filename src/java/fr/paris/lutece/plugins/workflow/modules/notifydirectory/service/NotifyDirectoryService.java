@@ -509,14 +509,10 @@ public final class NotifyDirectoryService
         Locale locale = getLocale( request );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Map<String, Object> model = new HashMap<String, Object>(  );
-        model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
 
-        //Directory directory = DirectoryHome.findByPrimaryKey( config.getIdDirectory(  ), pluginDirectory );
-        if ( directory != null )
-        {
-            model.put( NotifyDirectoryConstants.MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
-            model.put( NotifyDirectoryConstants.MARK_DIRECTORY_DESCRIPTION, directory.getDescription(  ) );
-        }
+        model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
+        model.put( NotifyDirectoryConstants.MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
+        model.put( NotifyDirectoryConstants.MARK_DIRECTORY_DESCRIPTION, directory.getDescription(  ) );
 
         RecordFieldFilter recordFieldFilter = new RecordFieldFilter(  );
         recordFieldFilter.setIdRecord( record.getIdRecord(  ) );
@@ -563,7 +559,40 @@ public final class NotifyDirectoryService
             model.put( NotifyDirectoryConstants.MARK_STATUS, state.getName(  ) );
         }
 
-        //Generate key
+        // Link View record
+        String strLinkViewRecordHtml = DirectoryUtils.EMPTY_STRING;
+
+        if ( config.isViewRecord(  ) )
+        {
+            StringBuilder sbBaseUrl = new StringBuilder( getBaseUrl( request ) );
+
+            if ( ( sbBaseUrl.length(  ) > 0 ) && !sbBaseUrl.toString(  ).endsWith( NotifyDirectoryConstants.SLASH ) )
+            {
+                sbBaseUrl.append( NotifyDirectoryConstants.SLASH );
+            }
+
+            sbBaseUrl.append( NotifyDirectoryConstants.JSP_DO_VISUALISATION_RECORD );
+
+            UrlItem url = new UrlItem( sbBaseUrl.toString(  ) );
+            url.addParameter( DirectoryUtils.PARAMETER_ID_DIRECTORY, directory.getIdDirectory(  ) );
+            url.addParameter( DirectoryUtils.PARAMETER_ID_DIRECTORY_RECORD, record.getIdRecord(  ) );
+
+            StringBuffer sbLinkHtml = new StringBuffer(  );
+            Map<String, String> mapParams = new HashMap<String, String>(  );
+            mapParams.put( NotifyDirectoryConstants.ATTRIBUTE_HREF, url.getUrl(  ) );
+            XmlUtil.beginElement( sbLinkHtml, NotifyDirectoryConstants.TAG_A, mapParams );
+            sbLinkHtml.append( config.getLabelLinkViewRecord(  ) );
+            XmlUtil.endElement( sbLinkHtml, NotifyDirectoryConstants.TAG_A );
+
+            Map<String, Object> modelTmp = new HashMap<String, Object>(  );
+            modelTmp.put( NotifyDirectoryConstants.MARK_LINK_VIEW_RECORD, url.getUrl(  ) );
+            strLinkViewRecordHtml = AppTemplateService.getTemplateFromStringFtl( sbLinkHtml.toString(  ), locale,
+                    modelTmp ).getHtml(  );
+        }
+
+        model.put( NotifyDirectoryConstants.MARK_LINK_VIEW_RECORD, strLinkViewRecordHtml );
+
+        // Generate key
         String linkHtml = DirectoryUtils.EMPTY_STRING;
 
         if ( config.isEmailValidation(  ) )
@@ -610,11 +639,8 @@ public final class NotifyDirectoryService
         model.put( NotifyDirectoryConstants.MARK_LINK, linkHtml );
 
         // Fill user attributes
-        if ( directory != null )
-        {
-            String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
-            fillModelWithUserAttributes( model, strUserGuid );
-        }
+        String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
+        fillModelWithUserAttributes( model, strUserGuid );
 
         // Fill the model with the info of other tasks
         for ( ITask task : getListTasks( nIdAction, locale ) )

@@ -26,6 +26,8 @@ CREATE TABLE task_notify_directory_cf(
   recipients_cc VARCHAR(255) DEFAULT '' NOT NULL,
   recipients_bcc VARCHAR(255) DEFAULT '' NOT NULL,
   id_mailing_list INT DEFAULT NULL,
+  is_view_record SMALLINT(6) NOT NULL DEFAULT 0,
+  label_link_view_record VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY  (id_task)
   );
 

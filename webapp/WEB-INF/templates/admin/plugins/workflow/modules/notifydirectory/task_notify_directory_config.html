@@ -160,6 +160,36 @@
 	</p>
 	<br />
 	<#if config?exists && config.idDirectory!=-1>
+		<p>
+			<label for="view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record} :</label>
+			<input type="checkbox" name="view_record" id="view_record" value="1" 
+				<#if config.viewRecord>
+					checked="checked"
+				</#if>	
+			/>
+		    <br/>
+		    <label>&nbsp;</label>
+			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record_comment}
+		</p>
+		<div id="record">
+			<p>
+				<label>&nbsp;</label>
+				#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker_link_view_record}
+			</p>
+			<p>
+		    	<label for="label_link_view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link_view_record} * :</label>
+		    	<#if config.labelLinkViewRecord?has_content>
+	     			<input type="text" name="label_link_view_record" id="" size="80" value="${config.labelLinkViewRecord}"  maxlength="255"/>
+		     	<#else>
+	     			<input type="text" name="label_link_view_record" id="" size="80" value=""  maxlength="255"/>
+		     	</#if>		
+			   	<br/>
+				<label>&nbsp;</label>
+				#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_view_record_comment}
+			</p>
+		</div>
+		<br />
+		<br />
 		<fieldset>
 			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_comment}</legend>
 			<table>
@@ -336,6 +366,9 @@ $( document ).ready( function(  ) {
 		}
 		$( '#mailing_list' ).hide(  );
 	}
+	if ( !$( '#view_record' ).is( ':checked' ) ) {
+		$( '#record' ).hide(  );
+	}
 	if ( !$( '#email_validation' ).is( ':checked' ) ) {
 		$( '#email' ).hide(  );
 	}
@@ -373,6 +406,9 @@ $( document ).ready( function(  ) {
 	} );
 	$( '#is_notify_by_user_guid' ).click( function(  ) {
 		$( '#entry_email' ).toggle( !$( this ).is( ':checked' ) );
+	} );
+	$( '#view_record' ).click( function(  ) {
+		$( '#record' ).toggle(  $( this ).is( ':checked' ) );
 	} );
 	$( '#email_validation' ).click( function(  ) {
 		$( '#email' ).toggle(  $( this ).is( ':checked' ) );

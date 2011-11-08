@@ -65,6 +65,7 @@ public final class NotifyDirectoryConstants
     public static final String FIELD_STATE = "module.workflow.notifydirectory.task_notify_directory_config.label_state";
     public static final String FIELD_MESSAGE_VALIDATION = "module.workflow.notifydirectory.task_notify_directory_config.label_message_validation";
     public static final String FIELD_LABEL_LINK = "module.workflow.notifydirectory.task_notify_directory_config.label_label_link";
+    public static final String FIELD_LABEL_LINK_VIEW_RECORD = "module.workflow.notifydirectory.task_notify_directory_config.label_label_link_view_record";
     public static final String FIELD_LABEL_PERIOD_VALIDITY = "module.workflow.notifydirectory.task_notify_directory_config.label_period_validity";
 
     // MESSAGES
@@ -109,6 +110,7 @@ public final class NotifyDirectoryConstants
     public static final String MARK_LAST_NAME = "last_name";
     public static final String MARK_EMAIL = "email";
     public static final String MARK_PHONE_NUMBER = "phone_number";
+    public static final String MARK_LINK_VIEW_RECORD = "link_view_record";
 
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
@@ -131,12 +133,17 @@ public final class NotifyDirectoryConstants
     public static final String PARAMETER_RECIPIENTS_CC = "recipients_cc";
     public static final String PARAMETER_RECIPIENTS_BCC = "recipients_bcc";
     public static final String PARAMETER_ID_MAILING_LIST = "id_mailing_list";
+    public static final String PARAMETER_VIEW_RECORD = "view_record";
+    public static final String PARAMETER_LABEL_LINK_VIEW_RECORD = "label_link_view_record";
 
     // TAGS
     public static final String TAG_A = "a";
 
     // ATTRIBUTES
     public static final String ATTRIBUTE_HREF = "href";
+
+    // JSP
+    public static final String JSP_DO_VISUALISATION_RECORD = "jsp/admin/plugins/directory/DoVisualisationRecord.jsp";
 
     /**
      * Private constructor

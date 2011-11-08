@@ -119,6 +119,8 @@ public class TaskNotifyDirectory extends Task
         String strRecipientsBcc = request.getParameter( NotifyDirectoryConstants.PARAMETER_RECIPIENTS_BCC );
         int nIdMailingList = DirectoryUtils.convertStringToInt( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_ID_MAILING_LIST ) );
+        String strViewRecord = request.getParameter( NotifyDirectoryConstants.PARAMETER_VIEW_RECORD );
+        String strLabelLinkViewRecord = request.getParameter( NotifyDirectoryConstants.PARAMETER_LABEL_LINK_VIEW_RECORD );
 
         String strApply = request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY );
         String strError = StringUtils.EMPTY;
@@ -185,6 +187,10 @@ public class TaskNotifyDirectory extends Task
                     strError = NotifyDirectoryConstants.FIELD_LABEL_PERIOD_VALIDITY;
                 }
             }
+            else if ( StringUtils.isNotBlank( strViewRecord ) && StringUtils.isBlank( strLabelLinkViewRecord ) )
+            {
+                strError = NotifyDirectoryConstants.FIELD_LABEL_LINK_VIEW_RECORD;
+            }
         }
 
         if ( !strError.equals( WorkflowUtils.EMPTY_STRING ) )
@@ -234,6 +240,8 @@ public class TaskNotifyDirectory extends Task
         config.setRecipientsCc( StringUtils.isNotEmpty( strRecipientsCc ) ? strRecipientsCc : StringUtils.EMPTY );
         config.setRecipientsBcc( StringUtils.isNotEmpty( strRecipientsBcc ) ? strRecipientsBcc : StringUtils.EMPTY );
         config.setIdMailingList( nIdMailingList );
+        config.setViewRecord( strViewRecord != null );
+        config.setLabelLinkViewRecord( strLabelLinkViewRecord );
 
         config.setNotifyByUserGuid( bIsNotifyByUserGuid );
 

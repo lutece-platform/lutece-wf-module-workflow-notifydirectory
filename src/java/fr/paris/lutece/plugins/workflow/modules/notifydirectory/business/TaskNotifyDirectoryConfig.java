@@ -61,6 +61,8 @@ public class TaskNotifyDirectoryConfig
     private String _strRecipientsCc;
     private String _strRecipientsBcc;
     private int _nIdMailingList;
+    private boolean _bViewRecord;
+    private String _strLabelLinkViewRecord;
 
     /**
      * Get the id task
@@ -420,5 +422,41 @@ public class TaskNotifyDirectoryConfig
     public void setIdMailingList( int nIdMailingList )
     {
         _nIdMailingList = nIdMailingList;
+    }
+
+    /**
+     * Set the link view record
+     * @param bViewRecord true if the email should include the link view record
+     */
+    public void setViewRecord( boolean bViewRecord )
+    {
+        _bViewRecord = bViewRecord;
+    }
+
+    /**
+     * Check if the email should include the link view record
+     * @return true if the email should include the link view record
+     */
+    public boolean isViewRecord(  )
+    {
+        return _bViewRecord;
+    }
+
+    /**
+     * Set the label for the link view record
+     * @param strLabelLinkViewRecord the label
+     */
+    public void setLabelLinkViewRecord( String strLabelLinkViewRecord )
+    {
+        _strLabelLinkViewRecord = strLabelLinkViewRecord;
+    }
+
+    /**
+     * Get the label for the link view record
+     * @return the label for the link view record
+     */
+    public String getLabelLinkViewRecord(  )
+    {
+        return _strLabelLinkViewRecord;
     }
 }
