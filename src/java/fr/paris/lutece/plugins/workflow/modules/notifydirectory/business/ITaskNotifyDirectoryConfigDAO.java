@@ -83,4 +83,27 @@ public interface ITaskNotifyDirectoryConfigDAO
      * @return List of TaskNotifyDirectoryConfig
      */
     List<TaskNotifyDirectoryConfig> loadAll( Plugin plugin );
+
+    /**
+     * Load the position of entry file which must insert in attachment mail
+     * @param nIdTask the id task
+     * @param plugin the plugin
+     * @return the position of entry file which must insert in attachment mail
+     */
+    List<Integer> loadListPositionEntryFile( int nIdTask, Plugin plugin );
+
+    /**
+     * Delete all position of entry file which must insert in attachment mail
+     * @param nIdTask the id task
+     * @param plugin the plugin
+     */
+    void deleteListPositionEntryFile( int nIdTask, Plugin plugin );
+
+    /**
+     * insert entry file which must insert in attachment mail
+     * @param nIdTask the id task
+     * @param nPositionEntryFile the entry file
+     * @param plugin the plugin
+     */
+    void insertListPositionEntryFile( int nIdTask, Integer nPositionEntryFile, Plugin plugin );
 }

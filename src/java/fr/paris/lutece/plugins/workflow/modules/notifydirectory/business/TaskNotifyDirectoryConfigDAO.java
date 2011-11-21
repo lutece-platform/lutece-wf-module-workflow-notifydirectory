@@ -58,6 +58,11 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     private static final String SQL_QUERY_DELETE = "DELETE FROM task_notify_directory_cf WHERE id_task = ? ";
     private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_mailing_list,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_cc,recipients_bcc,id_mailing_list,is_view_record,label_link_view_record " +
         "FROM task_notify_directory_cf";
+    private static final String SQL_QUERY_DELETE_POSITION_ENTRY_FILE = "DELETE FROM task_notify_directory_ef where id_task= ? ";
+    private static final String SQL_QUERY_INSERT_POSITION_ENTRY_FILE = "INSERT INTO task_notify_directory_ef( " +
+        "id_task,position_directory_entry_file) VALUES (?,?) ";
+    private static final String SQL_QUERY_FIND_LIST_POSITION_ENTRY_FILE = "SELECT position_directory_entry_file " +
+        "FROM task_notify_directory_ef  WHERE id_task= ?";
 
     /**
      * {@inheritDoc}
@@ -233,5 +238,50 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         daoUtil.free(  );
 
         return configList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Integer> loadListPositionEntryFile( int nIdTask, Plugin plugin )
+    {
+        List<Integer> listIntegerPositionEntryFile = new ArrayList<Integer>(  );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_LIST_POSITION_ENTRY_FILE, plugin );
+        daoUtil.setInt( 1, nIdTask );
+        daoUtil.executeQuery(  );
+
+        while ( daoUtil.next(  ) )
+        {
+            listIntegerPositionEntryFile.add( daoUtil.getInt( 1 ) );
+        }
+
+        daoUtil.free(  );
+
+        return listIntegerPositionEntryFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void deleteListPositionEntryFile( int nIdTask, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_POSITION_ENTRY_FILE, plugin );
+
+        daoUtil.setInt( 1, nIdTask );
+        daoUtil.executeUpdate(  );
+        daoUtil.free(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void insertListPositionEntryFile( int nIdTask, Integer nPositionEntryFile, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_POSITION_ENTRY_FILE, plugin );
+
+        daoUtil.setInt( 1, nIdTask );
+        daoUtil.setInt( 2, nPositionEntryFile );
+        daoUtil.executeUpdate(  );
+        daoUtil.free(  );
     }
 }

@@ -65,6 +65,14 @@ public final class TaskNotifyDirectoryConfigHome
     public static void create( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         _dao.insert( config, plugin );
+
+        if ( config.getListPositionEntryFile(  ) != null )
+        {
+            for ( Integer nPositionEntryFile : config.getListPositionEntryFile(  ) )
+            {
+                _dao.insertListPositionEntryFile( config.getIdTask(  ), nPositionEntryFile, plugin );
+            }
+        }
     }
 
     /**
@@ -76,6 +84,15 @@ public final class TaskNotifyDirectoryConfigHome
     public static void update( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         _dao.store( config, plugin );
+        _dao.deleteListPositionEntryFile( config.getIdTask(  ), plugin );
+
+        if ( config.getListPositionEntryFile(  ) != null )
+        {
+            for ( Integer nPositionEntryFile : config.getListPositionEntryFile(  ) )
+            {
+                _dao.insertListPositionEntryFile( config.getIdTask(  ), nPositionEntryFile, plugin );
+            }
+        }
     }
 
     /**
@@ -85,6 +102,7 @@ public final class TaskNotifyDirectoryConfigHome
      */
     public static void remove( int nIdTask, Plugin plugin )
     {
+        _dao.deleteListPositionEntryFile( nIdTask, plugin );
         _dao.delete( nIdTask, plugin );
     }
 
@@ -102,6 +120,11 @@ public final class TaskNotifyDirectoryConfigHome
     {
         TaskNotifyDirectoryConfig taskNotifyDirectoryConfig = _dao.load( nIdTask, plugin );
 
+        if ( taskNotifyDirectoryConfig != null )
+        {
+            taskNotifyDirectoryConfig.setListPositionEntryFile( _dao.loadListPositionEntryFile( nIdTask, plugin ) );
+        }
+
         return taskNotifyDirectoryConfig;
     }
 
@@ -114,6 +137,15 @@ public final class TaskNotifyDirectoryConfigHome
     public static List<TaskNotifyDirectoryConfig> getAll( Plugin plugin )
     {
         List<TaskNotifyDirectoryConfig> listTaskNotifyDirectoryConfig = _dao.loadAll( plugin );
+
+        if ( listTaskNotifyDirectoryConfig != null )
+        {
+            for ( TaskNotifyDirectoryConfig taskNotifyDirectoryConfig : listTaskNotifyDirectoryConfig )
+            {
+                taskNotifyDirectoryConfig.setListPositionEntryFile( _dao.loadListPositionEntryFile( 
+                        taskNotifyDirectoryConfig.getIdTask(  ), plugin ) );
+            }
+        }
 
         return listTaskNotifyDirectoryConfig;
     }

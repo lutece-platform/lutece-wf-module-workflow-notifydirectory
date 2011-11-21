@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
+import java.util.List;
+
 
 /**
  *
@@ -63,6 +65,7 @@ public class TaskNotifyDirectoryConfig
     private int _nIdMailingList;
     private boolean _bViewRecord;
     private String _strLabelLinkViewRecord;
+    private List<Integer> _listPositionEntryFile;
 
     /**
      * Get the id task
@@ -458,5 +461,23 @@ public class TaskNotifyDirectoryConfig
     public String getLabelLinkViewRecord(  )
     {
         return _strLabelLinkViewRecord;
+    }
+
+    /**
+     * set the list of entry file which must be include in mail attachments
+     * @param listPositionEntryFile  list of entry file which must be include in mail attachments
+     */
+    public void setListPositionEntryFile( List<Integer> listPositionEntryFile )
+    {
+        _listPositionEntryFile = listPositionEntryFile;
+    }
+
+    /**
+     * get the list of entry file which must be include in mail attachments
+     * @return the list of entry file which must be include in mail attachments
+     */
+    public List<Integer> getListPositionEntryFile(  )
+    {
+        return _listPositionEntryFile;
     }
 }

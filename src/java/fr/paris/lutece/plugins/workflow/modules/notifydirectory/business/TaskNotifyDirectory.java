@@ -59,10 +59,13 @@ import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.mail.FileAttachment;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -121,9 +124,9 @@ public class TaskNotifyDirectory extends Task
                     NotifyDirectoryConstants.PARAMETER_ID_MAILING_LIST ) );
         String strViewRecord = request.getParameter( NotifyDirectoryConstants.PARAMETER_VIEW_RECORD );
         String strLabelLinkViewRecord = request.getParameter( NotifyDirectoryConstants.PARAMETER_LABEL_LINK_VIEW_RECORD );
-
         String strApply = request.getParameter( NotifyDirectoryConstants.PARAMETER_APPLY );
         String strError = StringUtils.EMPTY;
+        String[] tabSelectedPositionEntryFile = request.getParameterValues( NotifyDirectoryConstants.PARAMETER_LIST_POSITION_ENTRY_FILE_CHECKED );
 
         if ( StringUtils.isBlank( strApply ) )
         {
@@ -270,6 +273,18 @@ public class TaskNotifyDirectory extends Task
             config.setNotifyByMailingList( true );
         }
 
+        if ( ( tabSelectedPositionEntryFile != null ) && ( tabSelectedPositionEntryFile.length > 0 ) )
+        {
+            List<Integer> listSelectedPositionEntryFile = new ArrayList<Integer>(  );
+
+            for ( int i = 0; i < tabSelectedPositionEntryFile.length; i++ )
+            {
+                listSelectedPositionEntryFile.add( WorkflowUtils.convertStringToInt( tabSelectedPositionEntryFile[i] ) );
+            }
+
+            config.setListPositionEntryFile( listSelectedPositionEntryFile );
+        }
+
         if ( bCreate )
         {
             TaskNotifyDirectoryConfigService.getService(  ).create( config, plugin );
@@ -298,13 +313,14 @@ public class TaskNotifyDirectory extends Task
     {
         NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
         TaskNotifyDirectoryConfigService configService = TaskNotifyDirectoryConfigService.getService(  );
+        TaskNotifyDirectoryConfig config = configService.findByPrimaryKey( getId(  ), plugin );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME );
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
 
-        model.put( NotifyDirectoryConstants.MARK_CONFIG, configService.findByPrimaryKey( getId(  ), plugin ) );
+        model.put( NotifyDirectoryConstants.MARK_CONFIG, config );
         model.put( NotifyDirectoryConstants.MARK_DEFAULT_SENDER_NAME, strDefaultSenderName );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_EMAIL_SMS,
             notifyDirectoryService.getListEntriesEmailSMS( getId(  ), locale ) );
@@ -319,6 +335,10 @@ public class TaskNotifyDirectory extends Task
             WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
             notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
+        model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FILE,
+            notifyDirectoryService.getListEntriesFile( getId(  ), locale ) );
+        model.put( NotifyDirectoryConstants.MARK_LIST_POSITION_ENTRY_FILE_CHECKED,
+            ( config != null ) ? config.getListPositionEntryFile(  ) : null );
         model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
         model.put( NotifyDirectoryConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
         model.put( NotifyDirectoryConstants.MARK_TASKS_LIST,
@@ -383,6 +403,10 @@ public class TaskNotifyDirectory extends Task
                             directory.getIdDirectory(  ) );
                     String strSmsContent = StringUtils.EMPTY;
 
+                    //Get Files Attachment
+                    List<FileAttachment> listFileAttachment = notifyDirectoryService.getFilesAttachment( config,
+                            record.getIdRecord(  ), directory.getIdDirectory(  ) );
+
                     // Get sender email
                     String strSenderEmail = MailService.getNoReplyEmail(  );
 
@@ -413,7 +437,7 @@ public class TaskNotifyDirectory extends Task
                     }
 
                     notifyDirectoryService.sendMessage( config, strEmail, strSms, strSenderEmail, strSubject,
-                        strEmailContent, strSmsContent );
+                        strEmailContent, strSmsContent, listFileAttachment );
                 }
             }
         }

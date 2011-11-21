@@ -14,6 +14,18 @@
 	<#assign position_entry_directory_user_guid = config.positionEntryDirectoryUserGuid>
 	<#assign id_state_after_validation = config.idStateAfterValidation>
 </#if>
+
+<#function isSelected entry  default_values >
+	<#if default_values?has_content>
+		<#list default_values as default_value>
+			<#if  default_value=entry>  		
+  				<#return true>
+  			</#if>
+  		</#list>
+	</#if>
+ <#return false>
+</#function>
+
 <h2> #i18n{module.workflow.notifydirectory.task_notify_directory_config.title}</h2>
 <div class="highlight-box">
 	<br />
@@ -275,6 +287,30 @@
 				  		<td>
 				  			&#36;&#123;position_${entry.position}&#125;
 				  		</td>
+				  	</tr>
+				  </#list>
+			</table>
+		</fieldset>
+	    <fieldset>
+			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_file}</legend>
+			<table>
+		  		<tr>
+		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_checked}</th>
+		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_name}</th>
+		  		</tr>
+			 	<#list list_entries_file as entry>
+				  	<tr>
+				  		<td>
+				  			<input type="checkbox" id="list_position_entry_file_checked" name="list_position_entry_file_checked" value="${entry.position}"
+				  				<#if ( list_position_entry_file_checked?has_content && isSelected (entry.position,list_position_entry_file_checked))>
+									checked="checked" 
+								</#if>
+				  			 />
+				  		</td>
+				  		<td>
+				  			${entry.title}
+				  		</td>
+				  		
 				  	</tr>
 				  </#list>
 			</table>

@@ -38,7 +38,9 @@ import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
 import fr.paris.lutece.plugins.directory.business.EntryHome;
 import fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation;
+import fr.paris.lutece.plugins.directory.business.File;
 import fr.paris.lutece.plugins.directory.business.IEntry;
+import fr.paris.lutece.plugins.directory.business.PhysicalFileHome;
 import fr.paris.lutece.plugins.directory.business.Record;
 import fr.paris.lutece.plugins.directory.business.RecordField;
 import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
@@ -76,6 +78,7 @@ import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.util.ReferenceList;
+import fr.paris.lutece.util.mail.FileAttachment;
 import fr.paris.lutece.util.url.UrlItem;
 import fr.paris.lutece.util.xml.XmlUtil;
 
@@ -107,6 +110,7 @@ public final class NotifyDirectoryService
     private List<Integer> _listAcceptedEntryTypesEmailSMS;
     private List<Integer> _listAcceptedEntryTypesUserGuid;
     private List<Integer> _listRefusedEntryTypes;
+    private List<Integer> _listAcceptedEntryTypesFile;
 
     /**
      * Private constructor
@@ -119,12 +123,16 @@ public final class NotifyDirectoryService
         // Init list accepted entry types for user guid
         _listAcceptedEntryTypesUserGuid = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_USER_GUID );
 
+        // Init list accepted entry types for file
+        _listAcceptedEntryTypesFile = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_FILE );
+
         // Init list refused entry types
         _listRefusedEntryTypes = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE_USER_GUID );
     }
 
     /**
      * Get the instance of the service
+     *
      * @return the instance of the service
      */
     public static NotifyDirectoryService getService(  )
@@ -137,7 +145,9 @@ public final class NotifyDirectoryService
 
     /**
      * Check if the given entry type id is accepted for the email or the sms
-     * @param nIdEntryType the id entry type
+     *
+     * @param nIdEntryType
+     *            the id entry type
      * @return true if it is accepted, false otherwise
      */
     public boolean isEntryTypeEmailSMSAccepted( int nIdEntryType )
@@ -154,7 +164,9 @@ public final class NotifyDirectoryService
 
     /**
      * Check if the given entry type id is accepted for the user guid
-     * @param nIdEntryType the id entry type
+     *
+     * @param nIdEntryType
+     *            the id entry type
      * @return true if it is accepted, false otherwise
      */
     public boolean isEntryTypeUserGuidAccepted( int nIdEntryType )
@@ -170,8 +182,30 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Check if the entry is refused (values set in the workflow-notifydirectory.properties)
-     * @param nIdEntryType the id entry type
+     * Check if the given entry type id is accepted for file
+     *
+     * @param nIdEntryType
+     *            the id entry type
+     * @return true if it is accepted, false otherwise
+     */
+    public boolean isEntryTypeFileAccepted( int nIdEntryType )
+    {
+        boolean bIsAccepted = false;
+
+        if ( ( _listAcceptedEntryTypesFile != null ) && !_listAcceptedEntryTypesFile.isEmpty(  ) )
+        {
+            bIsAccepted = _listAcceptedEntryTypesFile.contains( nIdEntryType );
+        }
+
+        return bIsAccepted;
+    }
+
+    /**
+     * Check if the entry is refused (values set in the
+     * workflow-notifydirectory.properties)
+     *
+     * @param nIdEntryType
+     *            the id entry type
      * @return true if it is refused, false otherwise
      */
     public boolean isEntryTypeRefused( int nIdEntryType )
@@ -190,7 +224,9 @@ public final class NotifyDirectoryService
 
     /**
      * Get the list of states
-     * @param nIdAction the id action
+     *
+     * @param nIdAction
+     *            the id action
      * @return a ReferenceList
      */
     public ReferenceList getListStates( int nIdAction )
@@ -216,6 +252,7 @@ public final class NotifyDirectoryService
 
     /**
      * Get the list of directorise
+     *
      * @return a ReferenceList
      */
     public ReferenceList getListDirectories(  )
@@ -235,7 +272,9 @@ public final class NotifyDirectoryService
 
     /**
      * Get the mailing list
-     * @param request the HTTP request
+     *
+     * @param request
+     *            the HTTP request
      * @return a ReferenceList
      */
     public ReferenceList getMailingList( HttpServletRequest request )
@@ -249,7 +288,9 @@ public final class NotifyDirectoryService
 
     /**
      * Get the list of entries from a given id task
-     * @param nIdTask the id task
+     *
+     * @param nIdTask
+     *            the id task
      * @return a list of IEntry
      */
     public List<IEntry> getListEntries( int nIdTask )
@@ -274,9 +315,13 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have the accepted type (which are defined in <b>workflow-notifycrm.properties</b>)
-     * @param nIdTask the id task
-     * @param locale the Locale
+     * Get the list of entries that have the accepted type (which are defined in
+     * <b>workflow-notifycrm.properties</b>)
+     *
+     * @param nIdTask
+     *            the id task
+     * @param locale
+     *            the Locale
      * @return a ReferenceList
      */
     public ReferenceList getListEntriesUserGuid( int nIdTask, Locale locale )
@@ -298,9 +343,13 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have the accepted type (which are defined in <b>workflow-notifycrm.properties</b>)
-     * @param nIdTask the id task
-     * @param locale the Locale
+     * Get the list of entries that have the accepted type (which are defined in
+     * <b>workflow-notifycrm.properties</b>)
+     *
+     * @param nIdTask
+     *            the id task
+     * @param locale
+     *            the Locale
      * @return a ReferenceList
      */
     public ReferenceList getListEntriesEmailSMS( int nIdTask, Locale locale )
@@ -322,10 +371,13 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have not the refused type (which are defined in the <b>workflow-notifycrm.properties</b>).
-     * <br />
-     * This list will be displayed as a freemarker label that the webmaster can use to write the notifications.
-     * @param nIdTask the id task
+     * Get the list of entries that have not the refused type (which are defined
+     * in the <b>workflow-notifycrm.properties</b>). <br />
+     * This list will be displayed as a freemarker label that the webmaster can
+     * use to write the notifications.
+     *
+     * @param nIdTask
+     *            the id task
      * @return a list of {@link IEntry}
      */
     public List<IEntry> getListEntriesFreemarker( int nIdTask )
@@ -346,10 +398,41 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the email from either an entry containing the email, or an entry containing the user guid
-     * @param config the config
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
+     * Get the list of entries that have the accepted type for file)
+     *
+     * @param nIdTask
+     *            the id task
+     * @param locale
+     *            the Locale
+     * @return a List of entries
+     */
+    public List<IEntry> getListEntriesFile( int nIdTask, Locale locale )
+    {
+        List<IEntry> listEntries = new ArrayList<IEntry>(  );
+
+        for ( IEntry entry : getListEntries( nIdTask ) )
+        {
+            int nIdEntryType = entry.getEntryType(  ).getIdType(  );
+
+            if ( isEntryTypeFileAccepted( nIdEntryType ) )
+            {
+                listEntries.add( entry );
+            }
+        }
+
+        return listEntries;
+    }
+
+    /**
+     * Get the email from either an entry containing the email, or an entry
+     * containing the user guid
+     *
+     * @param config
+     *            the config
+     * @param nIdRecord
+     *            the id record
+     * @param nIdDirectory
+     *            the id directory
      * @return the email
      */
     public String getEmail( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
@@ -377,9 +460,13 @@ public final class NotifyDirectoryService
 
     /**
      * Get the sms phone number
-     * @param config the config
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
+     *
+     * @param config
+     *            the config
+     * @param nIdRecord
+     *            the id record
+     * @param nIdDirectory
+     *            the id directory
      * @return the sms phone number
      */
     public String getSMSPhoneNumber( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
@@ -395,10 +482,47 @@ public final class NotifyDirectoryService
     }
 
     /**
+     * the files Attachments to insert in the mail
+     * @param config the configuration
+     * @param nIdRecord the record id
+     * @param nIdDirectory the  directory id
+     * @return the files Attachments to insert in the mail
+     */
+    public List<FileAttachment> getFilesAttachment( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
+    {
+        List<FileAttachment> listFileAttachment = null;
+
+        if ( ( config.getListPositionEntryFile(  ) != null ) && ( config.getListPositionEntryFile(  ).size(  ) > 0 ) )
+        {
+            File file = null;
+            FileAttachment fileAttachment;
+            listFileAttachment = new ArrayList<FileAttachment>(  );
+
+            for ( Integer nPositionEntryFile : config.getListPositionEntryFile(  ) )
+            {
+                file = getFile( nPositionEntryFile, nIdRecord, nIdDirectory );
+
+                if ( ( file != null ) && ( file.getPhysicalFile(  ) != null ) )
+                {
+                    fileAttachment = new FileAttachment( file.getTitle(  ), file.getPhysicalFile(  ).getValue(  ),
+                            file.getMimeType(  ) );
+                    listFileAttachment.add( fileAttachment );
+                }
+            }
+        }
+
+        return listFileAttachment;
+    }
+
+    /**
      * Get the user guid
-     * @param config the config
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
+     *
+     * @param config
+     *            the config
+     * @param nIdRecord
+     *            the id record
+     * @param nIdDirectory
+     *            the id directory
      * @return the user guid, an empty string if the position is not set
      */
     public String getUserGuid( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
@@ -415,8 +539,11 @@ public final class NotifyDirectoryService
 
     /**
      * Get the list of tasks
-     * @param nIdAction the id action
-     * @param locale the locale
+     *
+     * @param nIdAction
+     *            the id action
+     * @param locale
+     *            the locale
      * @return a list of {@link ITask}
      */
     public List<ITask> getListTasks( int nIdAction, Locale locale )
@@ -444,22 +571,40 @@ public final class NotifyDirectoryService
 
     /**
      * Send the message
-     * @param config the config
-     * @param strEmail the email
-     * @param strSms the sms
-     * @param strSenderEmail the sender email
-     * @param strSubject the subject
-     * @param strEmailContent the email content
-     * @param strSMSContent the sms content
+     *
+     * @param config
+     *            the config
+     * @param strEmail
+     *            the email
+     * @param strSms
+     *            the sms
+     * @param strSenderEmail
+     *            the sender email
+     * @param strSubject
+     *            the subject
+     * @param strEmailContent
+     *            the email content
+     * @param strSMSContent
+     *            the sms content
+     *
+     * @param listFileAttachment the list of attachments
      */
     public void sendMessage( TaskNotifyDirectoryConfig config, String strEmail, String strSms, String strSenderEmail,
-        String strSubject, String strEmailContent, String strSMSContent )
+        String strSubject, String strEmailContent, String strSMSContent, List<FileAttachment> listFileAttachment )
     {
         if ( config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail ) )
         {
-            // Build the mail message                
-            MailService.sendMailHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
-                config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+            // Build the mail message
+            if ( ( listFileAttachment != null ) && ( listFileAttachment.size(  ) > 0 ) )
+            {
+                MailService.sendMailMultipartHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent, null, listFileAttachment );
+            }
+            else
+            {
+                MailService.sendMailHtml( strEmail, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+            }
         }
 
         if ( config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms ) )
@@ -476,31 +621,57 @@ public final class NotifyDirectoryService
             // Send Mail
             for ( Recipient recipient : listRecipients )
             {
-                // Build the mail message
-                MailService.sendMailHtml( recipient.getEmail(  ), config.getSenderName(  ), strSenderEmail, strSubject,
-                    strEmailContent );
+                if ( ( listFileAttachment != null ) && ( listFileAttachment.size(  ) > 0 ) )
+                {
+                    MailService.sendMailMultipartHtml( recipient.getEmail(  ), config.getRecipientsCc(  ),
+                        config.getRecipientsBcc(  ), config.getSenderName(  ), strSenderEmail, strSubject,
+                        strEmailContent, null, listFileAttachment );
+                }
+                else
+                {
+                    // Build the mail message
+                    MailService.sendMailHtml( recipient.getEmail(  ), config.getSenderName(  ), strSenderEmail,
+                        strSubject, strEmailContent );
+                }
             }
         }
 
-        // If the task is not notified by email and the recipients bcc is not an empty string, then send the bcc
+        // If the task is not notified by email and the recipients bcc is not an
+        // empty string, then send the bcc
         if ( !config.isNotifyByEmail(  ) &&
                 ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
                 StringUtils.isNotBlank( config.getRecipientsCc(  ) ) ) )
         {
-            MailService.sendMailHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
-                config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+            if ( ( listFileAttachment != null ) && ( listFileAttachment.size(  ) > 0 ) )
+            {
+                MailService.sendMailMultipartHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent, null, listFileAttachment );
+            }
+            else
+            {
+                MailService.sendMailHtml( null, config.getRecipientsCc(  ), config.getRecipientsBcc(  ),
+                    config.getSenderName(  ), strSenderEmail, strSubject, strEmailContent );
+            }
         }
     }
 
     /**
      * Fill the model
-     * @param config the config
-     * @param resourceHistory the resource history
-     * @param record the record
-     * @param directory the directory
-     * @param request the HTTP request
-     * @param nIdAction the id action
-     * @param nIdHistory the id history
+     *
+     * @param config
+     *            the config
+     * @param resourceHistory
+     *            the resource history
+     * @param record
+     *            the record
+     * @param directory
+     *            the directory
+     * @param request
+     *            the HTTP request
+     * @param nIdAction
+     *            the id action
+     * @param nIdHistory
+     *            the id history
      * @return the model
      */
     public Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
@@ -543,6 +714,11 @@ public final class NotifyDirectoryService
                 {
                     value = listRecordField.get( 0 ).getField(  ).getTitle(  );
                 }
+            }
+            else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeFile &&
+                    ( recordField.getFile(  ) != null ) && ( recordField.getFile(  ).getTitle(  ) != null ) )
+            {
+                value = recordField.getFile(  ).getTitle(  );
             }
 
             recordField.setEntry( EntryHome.findByPrimaryKey( recordField.getEntry(  ).getIdEntry(  ), pluginDirectory ) );
@@ -656,9 +832,13 @@ public final class NotifyDirectoryService
 
     /**
      * Get the record field value
-     * @param nPosition the position of the entry
-     * @param nIdRecord the id record
-     * @param nIdDirectory the id directory
+     *
+     * @param nPosition
+     *            the position of the entry
+     * @param nIdRecord
+     *            the id record
+     * @param nIdDirectory
+     *            the id directory
      * @return the record field value
      */
     private String getRecordFieldValue( int nPosition, int nIdRecord, int nIdDirectory )
@@ -700,8 +880,65 @@ public final class NotifyDirectoryService
     }
 
     /**
+     * Get the directory file
+     *
+     * @param nPosition
+     *            the position of the entry
+     * @param nIdRecord
+     *            the id record
+     * @param nIdDirectory
+     *            the id directory
+     * @return the directory file
+     */
+    private File getFile( int nPosition, int nIdRecord, int nIdDirectory )
+    {
+        File file = null;
+        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+
+        // RecordField
+        EntryFilter entryFilter = new EntryFilter(  );
+        entryFilter.setPosition( nPosition );
+        entryFilter.setIdDirectory( nIdDirectory );
+
+        List<IEntry> listEntries = EntryHome.getEntryList( entryFilter, pluginDirectory );
+
+        if ( ( listEntries != null ) && !listEntries.isEmpty(  ) )
+        {
+            IEntry entry = listEntries.get( 0 );
+            RecordFieldFilter recordFieldFilter = new RecordFieldFilter(  );
+            recordFieldFilter.setIdDirectory( nIdDirectory );
+            recordFieldFilter.setIdEntry( entry.getIdEntry(  ) );
+            recordFieldFilter.setIdRecord( nIdRecord );
+
+            List<RecordField> listRecordFields = RecordFieldHome.getRecordFieldList( recordFieldFilter, pluginDirectory );
+
+            if ( ( listRecordFields != null ) && !listRecordFields.isEmpty(  ) && ( listRecordFields.get( 0 ) != null ) )
+            {
+                if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeFile )
+                {
+                    file = listRecordFields.get( 0 ).getFile(  );
+
+                    if ( file.getPhysicalFile(  ) != null )
+                    {
+                        file.setPhysicalFile( PhysicalFileHome.findByPrimaryKey( 
+                                file.getPhysicalFile(  ).getIdPhysicalFile(  ), pluginDirectory ) );
+                    }
+                }
+                else if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeDownloadUrl )
+                {
+                    file = DirectoryUtils.doDownloadFile( listRecordFields.get( 0 ).getValue(  ) );
+                }
+            }
+        }
+
+        return file;
+    }
+
+    /**
      * Get the base url
-     * @param request the HTTP request
+     *
+     * @param request
+     *            the HTTP request
      * @return the base url
      */
     private String getBaseUrl( HttpServletRequest request )
@@ -727,7 +964,9 @@ public final class NotifyDirectoryService
 
     /**
      * Get the locale
-     * @param request the HTTP request
+     *
+     * @param request
+     *            the HTTP request
      * @return the locale
      */
     private Locale getLocale( HttpServletRequest request )
@@ -748,8 +987,11 @@ public final class NotifyDirectoryService
 
     /**
      * Fills the model with user attributes
-     * @param model the model
-     * @param strUserGuid the user guid
+     *
+     * @param model
+     *            the model
+     * @param strUserGuid
+     *            the user guid
      */
     private void fillModelWithUserAttributes( Map<String, Object> model, String strUserGuid )
     {
@@ -775,8 +1017,11 @@ public final class NotifyDirectoryService
 
     /**
      * Build the reference entry into String
-     * @param entry the entry
-     * @param locale the Locale
+     *
+     * @param entry
+     *            the entry
+     * @param locale
+     *            the Locale
      * @return the reference entry
      */
     private String buildReferenceEntryToString( IEntry entry, Locale locale )
@@ -795,7 +1040,9 @@ public final class NotifyDirectoryService
 
     /**
      * Fill the list of entry types
-     * @param strPropertyEntryTypes the property containing the entry types
+     *
+     * @param strPropertyEntryTypes
+     *            the property containing the entry types
      * @return a list of integer
      */
     private static List<Integer> fillListEntryTypes( String strPropertyEntryTypes )

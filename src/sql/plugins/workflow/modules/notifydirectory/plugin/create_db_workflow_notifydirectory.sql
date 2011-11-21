@@ -30,6 +30,8 @@ CREATE TABLE task_notify_directory_cf(
   label_link_view_record VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY  (id_task)
   );
+  
+
 
 CREATE TABLE task_notify_directory_key(
 	key_email VARCHAR(255) DEFAULT NULL, 
@@ -39,3 +41,12 @@ CREATE TABLE task_notify_directory_key(
 	date_expiry timestamp DEFAULT NULL NULL,
 	PRIMARY KEY  (key_email)
 );
+
+ CREATE TABLE task_notify_directory_ef(
+  id_task INT DEFAULT NULL,
+  position_directory_entry_file INT DEFAULT NULL,
+  PRIMARY KEY  (id_task)
+  ); 
+  
+  ALTER TABLE task_notify_directory_ef ADD CONSTRAINT fk_id_task_template FOREIGN KEY (id_task)
+     REFERENCES task_notify_directory_cf (id_task)  ON DELETE RESTRICT ON UPDATE RESTRICT ;

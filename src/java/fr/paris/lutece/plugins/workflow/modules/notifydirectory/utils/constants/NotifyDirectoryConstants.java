@@ -77,6 +77,7 @@ public final class NotifyDirectoryConstants
     public static final String PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_EMAIL_SMS = "workflow-notifydirectory.acceptedDirectoryEntryTypesEmailSMS";
     public static final String PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_USER_GUID = "workflow-notifydirectory.acceptedDirectoryEntryTypesUserGuid";
     public static final String PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE_USER_GUID = "workflow-notifydirectory.refusedDirectoryEntryTypes";
+    public static final String PROPERTY_ACCEPTED_DIRECTORY_ENTRY_TYPE_FILE = "workflow-notifydirectory.acceptedDirectoryEntryTypesFile";
     public static final String PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME = "workflow-notifydirectory.notification_mail.default_sender_name";
     public static final String PROPERTY_SERVER_SMS = "workflow-notifydirectory.email_server_sms";
     public static final String PROPERTY_XPAGE_PAGETITLE = "module.workflow.notifydirectory.xpage.pagetitle";
@@ -111,6 +112,8 @@ public final class NotifyDirectoryConstants
     public static final String MARK_EMAIL = "email";
     public static final String MARK_PHONE_NUMBER = "phone_number";
     public static final String MARK_LINK_VIEW_RECORD = "link_view_record";
+    public static final String MARK_LIST_POSITION_ENTRY_FILE_CHECKED = "list_position_entry_file_checked";
+    public static final String MARK_LIST_ENTRIES_FILE = "list_entries_file";
 
     // PARAMETERS
     public static final String PARAMETER_PAGE = "page";
@@ -135,6 +138,7 @@ public final class NotifyDirectoryConstants
     public static final String PARAMETER_ID_MAILING_LIST = "id_mailing_list";
     public static final String PARAMETER_VIEW_RECORD = "view_record";
     public static final String PARAMETER_LABEL_LINK_VIEW_RECORD = "label_link_view_record";
+    public static final String PARAMETER_LIST_POSITION_ENTRY_FILE_CHECKED = "list_position_entry_file_checked";
 
     // TAGS
     public static final String TAG_A = "a";
