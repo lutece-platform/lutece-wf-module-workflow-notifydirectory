@@ -337,8 +337,13 @@ public class TaskNotifyDirectory extends Task
             notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FILE,
             notifyDirectoryService.getListEntriesFile( getId(  ), locale ) );
-        model.put( NotifyDirectoryConstants.MARK_LIST_POSITION_ENTRY_FILE_CHECKED,
-            ( config != null ) ? config.getListPositionEntryFile(  ) : null );
+
+        if ( config != null )
+        {
+            model.put( NotifyDirectoryConstants.MARK_LIST_POSITION_ENTRY_FILE_CHECKED,
+                config.getListPositionEntryFile(  ) );
+        }
+
         model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
         model.put( NotifyDirectoryConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
         model.put( NotifyDirectoryConstants.MARK_TASKS_LIST,

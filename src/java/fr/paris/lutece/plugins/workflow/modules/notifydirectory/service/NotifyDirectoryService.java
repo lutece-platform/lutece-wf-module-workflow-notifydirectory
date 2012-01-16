@@ -494,19 +494,23 @@ public final class NotifyDirectoryService
 
         if ( ( config.getListPositionEntryFile(  ) != null ) && ( config.getListPositionEntryFile(  ).size(  ) > 0 ) )
         {
-            File file = null;
-            FileAttachment fileAttachment;
             listFileAttachment = new ArrayList<FileAttachment>(  );
 
             for ( Integer nPositionEntryFile : config.getListPositionEntryFile(  ) )
             {
-                file = getFile( nPositionEntryFile, nIdRecord, nIdDirectory );
+                List<File> listFiles = getFiles( nPositionEntryFile, nIdRecord, nIdDirectory );
 
-                if ( ( file != null ) && ( file.getPhysicalFile(  ) != null ) )
+                if ( ( listFiles != null ) && !listFiles.isEmpty(  ) )
                 {
-                    fileAttachment = new FileAttachment( file.getTitle(  ), file.getPhysicalFile(  ).getValue(  ),
-                            file.getMimeType(  ) );
-                    listFileAttachment.add( fileAttachment );
+                    for ( File file : listFiles )
+                    {
+                        if ( ( file != null ) && ( file.getPhysicalFile(  ) != null ) )
+                        {
+                            FileAttachment fileAttachment = new FileAttachment( file.getTitle(  ),
+                                    file.getPhysicalFile(  ).getValue(  ), file.getMimeType(  ) );
+                            listFileAttachment.add( fileAttachment );
+                        }
+                    }
                 }
             }
         }
@@ -893,7 +897,7 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the directory file
+     * Get the directory files
      *
      * @param nPosition
      *            the position of the entry
@@ -903,9 +907,8 @@ public final class NotifyDirectoryService
      *            the id directory
      * @return the directory file
      */
-    private File getFile( int nPosition, int nIdRecord, int nIdDirectory )
+    private List<File> getFiles( int nPosition, int nIdRecord, int nIdDirectory )
     {
-        File file = null;
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
         // RecordField
@@ -927,24 +930,33 @@ public final class NotifyDirectoryService
 
             if ( ( listRecordFields != null ) && !listRecordFields.isEmpty(  ) && ( listRecordFields.get( 0 ) != null ) )
             {
-                if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeFile )
-                {
-                    file = listRecordFields.get( 0 ).getFile(  );
+                List<File> listFiles = new ArrayList<File>(  );
 
-                    if ( file.getPhysicalFile(  ) != null )
+                for ( RecordField recordField : listRecordFields )
+                {
+                    if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeFile )
                     {
-                        file.setPhysicalFile( PhysicalFileHome.findByPrimaryKey( 
-                                file.getPhysicalFile(  ).getIdPhysicalFile(  ), pluginDirectory ) );
+                        File file = recordField.getFile(  );
+
+                        if ( file.getPhysicalFile(  ) != null )
+                        {
+                            file.setPhysicalFile( PhysicalFileHome.findByPrimaryKey( 
+                                    file.getPhysicalFile(  ).getIdPhysicalFile(  ), pluginDirectory ) );
+                            listFiles.add( file );
+                        }
+                    }
+                    else if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeDownloadUrl )
+                    {
+                        File file = DirectoryUtils.doDownloadFile( recordField.getValue(  ) );
+                        listFiles.add( file );
                     }
                 }
-                else if ( entry instanceof fr.paris.lutece.plugins.directory.business.EntryTypeDownloadUrl )
-                {
-                    file = DirectoryUtils.doDownloadFile( listRecordFields.get( 0 ).getValue(  ) );
-                }
+
+                return listFiles;
             }
         }
 
-        return file;
+        return null;
     }
 
     /**

@@ -45,7 +45,7 @@ CREATE TABLE task_notify_directory_key(
  CREATE TABLE task_notify_directory_ef(
   id_task INT DEFAULT NULL,
   position_directory_entry_file INT DEFAULT NULL,
-  PRIMARY KEY  (id_task)
+  PRIMARY KEY  (id_task, position_directory_entry_file)
   ); 
   
   ALTER TABLE task_notify_directory_ef ADD CONSTRAINT fk_id_task_template FOREIGN KEY (id_task)
