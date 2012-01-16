@@ -10,7 +10,7 @@
 	<groupId>fr.paris.lutece.plugins</groupId>
 	<artifactId>module-workflow-notifydirectory</artifactId>
 	<packaging>lutece-plugin</packaging>
-	<version>1.1.5-SNAPSHOT</version>
+	<version>1.1.5</version>
 	<name>Workflow notify directory module</name>
 
 	<repositories>
@@ -43,8 +43,8 @@
         <jiraComponentId>10250</jiraComponentId>
     </properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-notifydirectory</url>
+        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/tags/module-workflow-notifydirectory-1.1.5</connection>
+        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/tags/module-workflow-notifydirectory-1.1.5</developerConnection>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/tags/module-workflow-notifydirectory-1.1.5</url>
     </scm>
 </project>
