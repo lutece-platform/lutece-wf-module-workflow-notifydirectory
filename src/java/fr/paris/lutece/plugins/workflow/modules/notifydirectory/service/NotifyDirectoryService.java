@@ -980,11 +980,16 @@ public final class NotifyDirectoryService
         }
         else
         {
-            strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_BASE_URL );
+            strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_ADMIN_PROD_URL );
 
             if ( StringUtils.isBlank( strBaseUrl ) )
             {
-                strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_PROD_URL );
+                strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_BASE_URL );
+
+                if ( StringUtils.isBlank( strBaseUrl ) )
+                {
+                    strBaseUrl = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_LUTECE_PROD_URL );
+                }
             }
         }
 
