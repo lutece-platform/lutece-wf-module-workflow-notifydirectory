@@ -284,6 +284,10 @@ public class TaskNotifyDirectory extends Task
 
             config.setListPositionEntryFile( listSelectedPositionEntryFile );
         }
+        else
+        {
+            config.setListPositionEntryFile( null );
+        }
 
         if ( bCreate )
         {
