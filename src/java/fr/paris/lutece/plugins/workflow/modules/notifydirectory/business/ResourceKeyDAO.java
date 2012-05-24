@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  *
- *class   TaskCommentConfig
+ * ResourceKeyDAO
  *
  */
 public class ResourceKeyDAO implements IResourceKeyDAO
@@ -59,6 +59,7 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( ResourceKey resourceKey, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -78,6 +79,7 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void store( ResourceKey resourceKey, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
@@ -98,6 +100,7 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public ResourceKey load( String strKey, Plugin plugin )
     {
         ResourceKey resourceKey = null;
@@ -126,6 +129,7 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( String strKey, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
@@ -138,6 +142,7 @@ public class ResourceKeyDAO implements IResourceKeyDAO
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<ResourceKey> selectResourceExpiry( Plugin plugin )
     {
         int nPos = 0;

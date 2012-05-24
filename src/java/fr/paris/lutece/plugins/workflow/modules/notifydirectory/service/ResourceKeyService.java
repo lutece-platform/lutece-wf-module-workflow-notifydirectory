@@ -31,84 +31,77 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
+package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.IResourceKeyDAO;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 
 /**
- * ResourceKeyHome
+ *
+ * ResourceKeyService
+ *
  */
-public final class ResourceKeyHome
+public class ResourceKeyService implements IResourceKeyService
 {
-    // Static variable pointed at the DAO instance
-    private static IResourceKeyDAO _dao = (IResourceKeyDAO) SpringContextService.getPluginBean( NotifyDirectoryPlugin.PLUGIN_NAME,
-            "taskNotifyDirectoryResourceKeyDAO" );
+    public static final String BEAN_SERVICE = "workflow-notifydirectory.resourceKeyService";
+    @Inject
+    private IResourceKeyDAO _resourceKeyDAO;
 
     /**
-     * Private constructor - this class need not be instantiated
+     * {@inheritDoc}
      */
-    private ResourceKeyHome(  )
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    public void create( ResourceKey resourceKey, Plugin plugin )
     {
+        _resourceKeyDAO.insert( resourceKey, plugin );
     }
 
     /**
-     * Insert new resourceKey
-     *
-     * @param resourceKey object ResourceKey
-     * @param plugin the plugin
+     * {@inheritDoc}
      */
-    public static void create( ResourceKey resourceKey, Plugin plugin )
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    public void update( ResourceKey resourceKey, Plugin plugin )
     {
-        _dao.insert( resourceKey, plugin );
+        _resourceKeyDAO.store( resourceKey, plugin );
     }
 
     /**
-     * Update a ResourceKey
-     *
-     * @param resourceKey object ResourceKey
-     * @param plugin the plugin
+     * {@inheritDoc}
      */
-    public static void update( ResourceKey resourceKey, Plugin plugin )
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    public void remove( String strKey, Plugin plugin )
     {
-        _dao.store( resourceKey, plugin );
+        _resourceKeyDAO.delete( strKey, plugin );
     }
 
     /**
-     * Delete a ResourceKey
-     * @param strKey key
-     * @param plugin the plugin
+     * {@inheritDoc}
      */
-    public static void remove( String strKey, Plugin plugin )
+    @Override
+    public ResourceKey findByPrimaryKey( String strKey, Plugin plugin )
     {
-        _dao.delete( strKey, plugin );
-    }
-
-    /**
-     * Delete a ResourceKey
-     * @param strKey key
-     * @param plugin the plugin
-     * @return a ResourceKey
-     *
-     */
-    public static ResourceKey findByPrimaryKey( String strKey, Plugin plugin )
-    {
-        ResourceKey resourceKey = _dao.load( strKey, plugin );
+        ResourceKey resourceKey = _resourceKeyDAO.load( strKey, plugin );
 
         return resourceKey;
     }
 
     /**
-     * Delete a ResourceKey expiry
-     * @param plugin the plugin
-     * @return a list of {@link ResourceKey}
+     * {@inheritDoc}
      */
-    public static List<ResourceKey> selectResourceExpiry( Plugin plugin )
+    @Override
+    public List<ResourceKey> selectResourceExpiry( Plugin plugin )
     {
-        return _dao.selectResourceExpiry( plugin );
+        return _resourceKeyDAO.selectResourceExpiry( plugin );
     }
 }

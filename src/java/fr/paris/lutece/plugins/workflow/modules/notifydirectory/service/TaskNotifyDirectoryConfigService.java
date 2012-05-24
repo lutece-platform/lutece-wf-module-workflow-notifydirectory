@@ -33,12 +33,15 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 /**
@@ -46,81 +49,63 @@ import java.util.List;
  * TaskNotifyDirectoryConfigService
  *
  */
-public final class TaskNotifyDirectoryConfigService
+public class TaskNotifyDirectoryConfigService implements ITaskNotifyDirectoryConfigService
 {
-    private static final String BEAN_TASK_NOTIFY_Directory_CONFIG_SERVICE = "workflow-notifydirectory.taskNotifyDirectoryConfigService";
+    public static final String BEAN_SERVICE = "workflow-notifydirectory.taskNotifyDirectoryConfigService";
+    @Inject
+    private ITaskNotifyDirectoryConfigDAO _taskNotifyDirectoryConfigDAO;
 
     /**
-     * Private constructor
+     * {@inheritDoc}
      */
-    private TaskNotifyDirectoryConfigService(  )
-    {
-    }
-
-    /**
-     * Get the instance of {@link TaskNotifyDirectoryConfigService}
-     * @return the instance of {@link TaskNotifyDirectoryConfigService}
-     */
-    public static TaskNotifyDirectoryConfigService getService(  )
-    {
-        return (TaskNotifyDirectoryConfigService) SpringContextService.getPluginBean( NotifyDirectoryPlugin.PLUGIN_NAME,
-            BEAN_TASK_NOTIFY_Directory_CONFIG_SERVICE );
-    }
-
-    /**
-     * Create a new config
-     * @param plugin the Plugin
-     * @param config the config
-     */
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
     public void create( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         if ( config != null )
         {
-            TaskNotifyDirectoryConfigHome.create( config, plugin );
+            _taskNotifyDirectoryConfigDAO.insert( config, plugin );
         }
     }
 
     /**
-     * Update a config
-     * @param plugin the Plugin
-     * @param config the config
+     * {@inheritDoc}
      */
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
     public void update( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         if ( config != null )
         {
-            TaskNotifyDirectoryConfigHome.update( config, plugin );
+            _taskNotifyDirectoryConfigDAO.store( config, plugin );
         }
     }
 
     /**
-     * Remove a config
-     * @param plugin the Plugin
-     * @param nIdTask the task id
+     * {@inheritDoc}
      */
+    @Override
+    @Transactional( "workflow-notifydirectory.transactionManager" )
     public void remove( int nIdTask, Plugin plugin )
     {
-        TaskNotifyDirectoryConfigHome.remove( nIdTask, plugin );
+        _taskNotifyDirectoryConfigDAO.delete( nIdTask, plugin );
     }
 
     /**
-     * Find a config
-     * @param nIdTask the id task
-     * @param plugin the Plugin
-     * @return an instance of {@link TaskNotifyDirectoryConfig}
+     * {@inheritDoc}
      */
+    @Override
     public TaskNotifyDirectoryConfig findByPrimaryKey( int nIdTask, Plugin plugin )
     {
-        return TaskNotifyDirectoryConfigHome.findByPrimaryKey( nIdTask, plugin );
+        return _taskNotifyDirectoryConfigDAO.load( nIdTask, plugin );
     }
 
     /**
-     * Get all configs
-     * @param plugin the Plugin
-     * @return a list of {@link TaskNotifyDirectoryConfig}
+     * {@inheritDoc}
      */
+    @Override
     public List<TaskNotifyDirectoryConfig> findAll( Plugin plugin )
     {
-        return TaskNotifyDirectoryConfigHome.getAll( plugin );
+        return _taskNotifyDirectoryConfigDAO.loadAll( plugin );
     }
 }

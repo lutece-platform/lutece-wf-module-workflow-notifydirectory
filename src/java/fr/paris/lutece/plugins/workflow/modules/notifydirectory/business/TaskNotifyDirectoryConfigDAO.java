@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  *
- * class TaskNotifyDirectoryConfigDAO
+ * TaskNotifyDirectoryConfigDAO
  *
  */
 public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigDAO
@@ -67,6 +67,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -103,6 +104,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void store( TaskNotifyDirectoryConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
@@ -140,6 +142,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public TaskNotifyDirectoryConfig load( int nIdTask, Plugin plugin )
     {
         TaskNotifyDirectoryConfig config = null;
@@ -186,6 +189,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdState, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
@@ -198,6 +202,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<TaskNotifyDirectoryConfig> loadAll( Plugin plugin )
     {
         List<TaskNotifyDirectoryConfig> configList = new ArrayList<TaskNotifyDirectoryConfig>(  );
@@ -243,6 +248,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Integer> loadListPositionEntryFile( int nIdTask, Plugin plugin )
     {
         List<Integer> listIntegerPositionEntryFile = new ArrayList<Integer>(  );
@@ -263,6 +269,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void deleteListPositionEntryFile( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_POSITION_ENTRY_FILE, plugin );
@@ -275,6 +282,7 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
     /**
      * {@inheritDoc}
      */
+    @Override
     public void insertListPositionEntryFile( int nIdTask, Integer nPositionEntryFile, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_POSITION_ENTRY_FILE, plugin );

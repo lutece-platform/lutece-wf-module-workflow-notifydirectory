@@ -47,24 +47,22 @@ import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
 import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.workflow.business.ActionHome;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
-import fr.paris.lutece.plugins.workflow.business.StateFilter;
-import fr.paris.lutece.plugins.workflow.business.StateHome;
-import fr.paris.lutece.plugins.workflow.business.task.ITask;
-import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.TaskInfoManager;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.business.state.State;
+import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
+import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
+import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.portal.business.mailinglist.Recipient;
-import fr.paris.lutece.portal.business.workflow.Action;
-import fr.paris.lutece.portal.business.workflow.State;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
@@ -72,7 +70,6 @@ import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -96,6 +93,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -104,9 +103,23 @@ import javax.servlet.http.HttpServletRequest;
  * NotifyDirectoryService
  *
  */
-public final class NotifyDirectoryService
+public final class NotifyDirectoryService implements INotifyDirectoryService
 {
-    private static final String BEAN_NOTIFY_DIRECTORY_SERVICE = "workflow-notifydirectory.notifyDirectoryService";
+    public static final String BEAN_SERVICE = "workflow-notifydirectory.notifyDirectoryService";
+
+    // SERVICES
+    @Inject
+    private IActionService _actionService;
+    @Inject
+    private IStateService _stateService;
+    @Inject
+    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryService;
+    @Inject
+    private IWorkflowUserAttributesManager _userAttributesManager;
+    @Inject
+    private ITaskService _taskService;
+    @Inject
+    private IResourceKeyService _resourceKeyService;
     private List<Integer> _listAcceptedEntryTypesEmailSMS;
     private List<Integer> _listAcceptedEntryTypesUserGuid;
     private List<Integer> _listRefusedEntryTypes;
@@ -130,26 +143,12 @@ public final class NotifyDirectoryService
         _listRefusedEntryTypes = fillListEntryTypes( NotifyDirectoryConstants.PROPERTY_REFUSED_DIRECTORY_ENTRY_TYPE_USER_GUID );
     }
 
-    /**
-     * Get the instance of the service
-     *
-     * @return the instance of the service
-     */
-    public static NotifyDirectoryService getService(  )
-    {
-        return (NotifyDirectoryService) SpringContextService.getPluginBean( NotifyDirectoryPlugin.PLUGIN_NAME,
-            BEAN_NOTIFY_DIRECTORY_SERVICE );
-    }
-
     // CHECKS
 
     /**
-     * Check if the given entry type id is accepted for the email or the sms
-     *
-     * @param nIdEntryType
-     *            the id entry type
-     * @return true if it is accepted, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeEmailSMSAccepted( int nIdEntryType )
     {
         boolean bIsAccepted = false;
@@ -163,12 +162,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Check if the given entry type id is accepted for the user guid
-     *
-     * @param nIdEntryType
-     *            the id entry type
-     * @return true if it is accepted, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeUserGuidAccepted( int nIdEntryType )
     {
         boolean bIsAccepted = false;
@@ -182,12 +178,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Check if the given entry type id is accepted for file
-     *
-     * @param nIdEntryType
-     *            the id entry type
-     * @return true if it is accepted, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeFileAccepted( int nIdEntryType )
     {
         boolean bIsAccepted = false;
@@ -201,13 +194,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Check if the entry is refused (values set in the
-     * workflow-notifydirectory.properties)
-     *
-     * @param nIdEntryType
-     *            the id entry type
-     * @return true if it is refused, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean isEntryTypeRefused( int nIdEntryType )
     {
         boolean bIsRefused = true;
@@ -223,24 +212,20 @@ public final class NotifyDirectoryService
     // GETS
 
     /**
-     * Get the list of states
-     *
-     * @param nIdAction
-     *            the id action
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListStates( int nIdAction )
     {
-        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         ReferenceList referenceListStates = new ReferenceList(  );
-        Action action = ActionHome.findByPrimaryKey( nIdAction, pluginWorkflow );
+        Action action = _actionService.findByPrimaryKey( nIdAction );
 
         if ( ( action != null ) && ( action.getWorkflow(  ) != null ) )
         {
             StateFilter stateFilter = new StateFilter(  );
             stateFilter.setIdWorkflow( action.getWorkflow(  ).getId(  ) );
 
-            List<State> listStates = StateHome.getListStateByFilter( stateFilter, pluginWorkflow );
+            List<State> listStates = _stateService.getListStateByFilter( stateFilter );
 
             referenceListStates.addItem( DirectoryUtils.CONSTANT_ID_NULL, StringUtils.EMPTY );
             referenceListStates.addAll( ReferenceList.convert( listStates, NotifyDirectoryConstants.ID,
@@ -251,10 +236,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of directorise
-     *
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListDirectories(  )
     {
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
@@ -271,12 +255,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the mailing list
-     *
-     * @param request
-     *            the HTTP request
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getMailingList( HttpServletRequest request )
     {
         ReferenceList refMailingList = new ReferenceList(  );
@@ -287,19 +268,15 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries from a given id task
-     *
-     * @param nIdTask
-     *            the id task
-     * @return a list of IEntry
+     * {@inheritDoc}
      */
+    @Override
     public List<IEntry> getListEntries( int nIdTask )
     {
         Plugin pluginNotifyDirectory = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( nIdTask,
-                pluginNotifyDirectory );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryService.findByPrimaryKey( nIdTask, pluginNotifyDirectory );
 
         List<IEntry> listEntries = new ArrayList<IEntry>(  );
 
@@ -315,15 +292,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have the accepted type (which are defined in
-     * <b>workflow-notifycrm.properties</b>)
-     *
-     * @param nIdTask
-     *            the id task
-     * @param locale
-     *            the Locale
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListEntriesUserGuid( int nIdTask, Locale locale )
     {
         ReferenceList refenreceListEntries = new ReferenceList(  );
@@ -343,15 +314,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have the accepted type (which are defined in
-     * <b>workflow-notifycrm.properties</b>)
-     *
-     * @param nIdTask
-     *            the id task
-     * @param locale
-     *            the Locale
-     * @return a ReferenceList
+     * {@inheritDoc}
      */
+    @Override
     public ReferenceList getListEntriesEmailSMS( int nIdTask, Locale locale )
     {
         ReferenceList refenreceListEntries = new ReferenceList(  );
@@ -371,15 +336,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have not the refused type (which are defined
-     * in the <b>workflow-notifycrm.properties</b>). <br />
-     * This list will be displayed as a freemarker label that the webmaster can
-     * use to write the notifications.
-     *
-     * @param nIdTask
-     *            the id task
-     * @return a list of {@link IEntry}
+     * {@inheritDoc}
      */
+    @Override
     public List<IEntry> getListEntriesFreemarker( int nIdTask )
     {
         List<IEntry> listEntries = new ArrayList<IEntry>(  );
@@ -398,14 +357,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of entries that have the accepted type for file)
-     *
-     * @param nIdTask
-     *            the id task
-     * @param locale
-     *            the Locale
-     * @return a List of entries
+     * {@inheritDoc}
      */
+    @Override
     public List<IEntry> getListEntriesFile( int nIdTask, Locale locale )
     {
         List<IEntry> listEntries = new ArrayList<IEntry>(  );
@@ -424,17 +378,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the email from either an entry containing the email, or an entry
-     * containing the user guid
-     *
-     * @param config
-     *            the config
-     * @param nIdRecord
-     *            the id record
-     * @param nIdDirectory
-     *            the id directory
-     * @return the email
+     * {@inheritDoc}
      */
+    @Override
     public String getEmail( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
     {
         String strEmail = StringUtils.EMPTY;
@@ -445,9 +391,7 @@ public final class NotifyDirectoryService
             {
                 String strUserGuid = getRecordFieldValue( config.getPositionEntryDirectoryUserGuid(  ), nIdRecord,
                         nIdDirectory );
-                strEmail = WorkflowUserAttributesManager.getManager(  )
-                                                        .getAttribute( strUserGuid,
-                        LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
+                strEmail = _userAttributesManager.getAttribute( strUserGuid, LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );
             }
             else
             {
@@ -459,16 +403,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the sms phone number
-     *
-     * @param config
-     *            the config
-     * @param nIdRecord
-     *            the id record
-     * @param nIdDirectory
-     *            the id directory
-     * @return the sms phone number
+     * {@inheritDoc}
      */
+    @Override
     public String getSMSPhoneNumber( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
     {
         String strSMSPhoneNumber = StringUtils.EMPTY;
@@ -482,12 +419,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * the files Attachments to insert in the mail
-     * @param config the configuration
-     * @param nIdRecord the record id
-     * @param nIdDirectory the  directory id
-     * @return the files Attachments to insert in the mail
+     * {@inheritDoc}
      */
+    @Override
     public List<FileAttachment> getFilesAttachment( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
     {
         List<FileAttachment> listFileAttachment = null;
@@ -519,16 +453,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the user guid
-     *
-     * @param config
-     *            the config
-     * @param nIdRecord
-     *            the id record
-     * @param nIdDirectory
-     *            the id directory
-     * @return the user guid, an empty string if the position is not set
+     * {@inheritDoc}
      */
+    @Override
     public String getUserGuid( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory )
     {
         String strUserGuid = StringUtils.EMPTY;
@@ -542,22 +469,16 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Get the list of tasks
-     *
-     * @param nIdAction
-     *            the id action
-     * @param locale
-     *            the locale
-     * @return a list of {@link ITask}
+     * {@inheritDoc}
      */
+    @Override
     public List<ITask> getListTasks( int nIdAction, Locale locale )
     {
         List<ITask> listTasks = new ArrayList<ITask>(  );
-        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
-        for ( ITask task : TaskHome.getListTaskByIdAction( nIdAction, pluginWorkflow, locale ) )
+        for ( ITask task : _taskService.getListTaskByIdAction( nIdAction, locale ) )
         {
-            for ( ITaskInfoProvider provider : TaskInfoManager.getManager(  ).getProvidersList(  ) )
+            for ( ITaskInfoProvider provider : TaskInfoManager.getProvidersList(  ) )
             {
                 if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
                 {
@@ -574,25 +495,9 @@ public final class NotifyDirectoryService
     // OTHERS
 
     /**
-     * Send the message
-     *
-     * @param config
-     *            the config
-     * @param strEmail
-     *            the email
-     * @param strSms
-     *            the sms
-     * @param strSenderEmail
-     *            the sender email
-     * @param strSubject
-     *            the subject
-     * @param strEmailContent
-     *            the email content
-     * @param strSMSContent
-     *            the sms content
-     *
-     * @param listFileAttachment the list of attachments
+     * {@inheritDoc}
      */
+    @Override
     public void sendMessage( TaskNotifyDirectoryConfig config, String strEmail, String strSms, String strSenderEmail,
         String strSubject, String strEmailContent, String strSMSContent, List<FileAttachment> listFileAttachment )
     {
@@ -660,24 +565,9 @@ public final class NotifyDirectoryService
     }
 
     /**
-     * Fill the model
-     *
-     * @param config
-     *            the config
-     * @param resourceHistory
-     *            the resource history
-     * @param record
-     *            the record
-     * @param directory
-     *            the directory
-     * @param request
-     *            the HTTP request
-     * @param nIdAction
-     *            the id action
-     * @param nIdHistory
-     *            the id history
-     * @return the model
+     * {@inheritDoc}
      */
+    @Override
     public Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
         Record record, Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
@@ -800,7 +690,7 @@ public final class NotifyDirectoryService
             Calendar calendar = GregorianCalendar.getInstance(  );
             calendar.add( Calendar.DAY_OF_MONTH, config.getPeriodValidity(  ) );
             resourceKey.setDateExpiry( new Timestamp( calendar.getTimeInMillis(  ) ) );
-            ResourceKeyHome.create( resourceKey, pluginDirectory );
+            _resourceKeyService.create( resourceKey, PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME ) );
 
             StringBuilder sbBaseUrl = new StringBuilder( getBaseUrl( request ) );
 
@@ -839,7 +729,7 @@ public final class NotifyDirectoryService
         for ( ITask task : getListTasks( nIdAction, locale ) )
         {
             model.put( NotifyDirectoryConstants.MARK_TASK + task.getId(  ),
-                TaskInfoManager.getManager(  ).getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
+                TaskInfoManager.getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
         }
 
         return model;
@@ -1029,10 +919,9 @@ public final class NotifyDirectoryService
      */
     private void fillModelWithUserAttributes( Map<String, Object> model, String strUserGuid )
     {
-        if ( WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) && StringUtils.isNotBlank( strUserGuid ) )
+        if ( _userAttributesManager.isEnabled(  ) && StringUtils.isNotBlank( strUserGuid ) )
         {
-            Map<String, String> mapUserAttributes = WorkflowUserAttributesManager.getManager(  )
-                                                                                 .getAttributes( strUserGuid );
+            Map<String, String> mapUserAttributes = _userAttributesManager.getAttributes( strUserGuid );
             String strFirstName = mapUserAttributes.get( LuteceUser.NAME_GIVEN );
             String strLastName = mapUserAttributes.get( LuteceUser.NAME_FAMILY );
             String strEmail = mapUserAttributes.get( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL );

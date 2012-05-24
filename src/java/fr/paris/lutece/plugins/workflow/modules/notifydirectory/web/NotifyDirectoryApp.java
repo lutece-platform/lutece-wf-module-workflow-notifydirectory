@@ -33,31 +33,37 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.web;
 
-import fr.paris.lutece.plugins.workflow.business.ActionHome;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistoryHome;
-import fr.paris.lutece.plugins.workflow.business.ResourceWorkflow;
-import fr.paris.lutece.plugins.workflow.business.ResourceWorkflowHome;
-import fr.paris.lutece.plugins.workflow.business.StateHome;
-import fr.paris.lutece.plugins.workflow.business.task.ITask;
-import fr.paris.lutece.plugins.workflow.business.task.TaskHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyHome;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.IResourceKeyService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ITaskNotifyDirectoryConfigService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ResourceKeyService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
-import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.WorkflowService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
-import fr.paris.lutece.portal.business.workflow.Action;
-import fr.paris.lutece.portal.business.workflow.State;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
+import fr.paris.lutece.plugins.workflowcore.business.state.State;
+import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
+import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryService;
+import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceWorkflowService;
+import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
+import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -74,6 +80,7 @@ import javax.servlet.http.HttpSession;
 
 
 /**
+ *
  * This class manages Form page.
  *
  */
@@ -82,15 +89,19 @@ public class NotifyDirectoryApp implements XPageApplication
     // Templates
     private static final String TEMPLATE_XPAGE_VALIDATION = "skin/plugins/workflow/modules/notifydirectory/task_notify_directory_validation.html";
 
+    // SERVICES
+    private IResourceKeyService _resourceKeyService = SpringContextService.getBean( ResourceKeyService.BEAN_SERVICE );
+    private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
+    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryConfigService = SpringContextService.getBean( TaskNotifyDirectoryConfigService.BEAN_SERVICE );
+    private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
+    private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
+    private IResourceHistoryService _resourceHistoryService = SpringContextService.getBean( ResourceHistoryService.BEAN_SERVICE );
+    private IResourceWorkflowService _resourceWorkflowService = SpringContextService.getBean( ResourceWorkflowService.BEAN_SERVICE );
+
     /**
-     * Returns the Form XPage result content depending on the request parameters and the current mode.
-     *
-     * @param request The HTTP request.
-     * @param nMode The current mode.
-     * @param plugin The Plugin
-     * @return The page content.
-     * @throws SiteMessageException the SiteMessageException
+     * {@inheritDoc}
      */
+    @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin )
         throws SiteMessageException
     {
@@ -101,7 +112,7 @@ public class NotifyDirectoryApp implements XPageApplication
                 request.getLocale(  ) ) );
         page.setPathLabel( I18nService.getLocalizedString( NotifyDirectoryConstants.PROPERTY_XPAGE_PATHLABEL,
                 request.getLocale(  ) ) );
-        page.setContent( getValid( request, session, nMode, plugin ) );
+        page.setContent( getValid( request, session, plugin ) );
 
         return page;
     }
@@ -110,32 +121,30 @@ public class NotifyDirectoryApp implements XPageApplication
      * Perform formSubmit in database and return the result page
      * @param request The HTTP request
      * @param session the session
-     * @param nMode The current mode.
      * @param plugin The Plugin
      * @return the form recap
      * @throws SiteMessageException SiteMessageException
      */
-    private String getValid( HttpServletRequest request, HttpSession session, int nMode, Plugin plugin )
+    private String getValid( HttpServletRequest request, HttpSession session, Plugin plugin )
         throws SiteMessageException
     {
-        Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         Locale locale = request.getLocale(  );
         Map<String, Object> model = new HashMap<String, Object>(  );
 
         if ( request.getParameter( NotifyDirectoryConstants.PARAMETER_KEY ) != null )
         {
-            ResourceKey resourceKey = ResourceKeyHome.findByPrimaryKey( request.getParameter( 
+            ResourceKey resourceKey = _resourceKeyService.findByPrimaryKey( request.getParameter( 
                         NotifyDirectoryConstants.PARAMETER_KEY ), plugin );
             Timestamp currentDate = new Timestamp( GregorianCalendar.getInstance(  ).getTimeInMillis(  ) );
 
             if ( ( resourceKey != null ) && currentDate.before( resourceKey.getDateExpiry(  ) ) )
             {
-                ITask task = TaskHome.findByPrimaryKey( resourceKey.getIdTask(  ), plugin, locale );
-                TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigHome.findByPrimaryKey( task.getId(  ),
+                ITask task = _taskService.findByPrimaryKey( resourceKey.getIdTask(  ), locale );
+                TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ),
                         plugin );
 
-                State state = StateHome.findByPrimaryKey( config.getIdStateAfterValidation(  ), pluginWorkflow );
-                Action action = ActionHome.findByPrimaryKey( task.getAction(  ).getId(  ), pluginWorkflow );
+                State state = _stateService.findByPrimaryKey( config.getIdStateAfterValidation(  ) );
+                Action action = _actionService.findByPrimaryKey( task.getAction(  ).getId(  ) );
 
                 // Create Resource History
                 ResourceHistory resourceHistory = new ResourceHistory(  );
@@ -145,16 +154,16 @@ public class NotifyDirectoryApp implements XPageApplication
                 resourceHistory.setWorkFlow( action.getWorkflow(  ) );
                 resourceHistory.setCreationDate( WorkflowUtils.getCurrentTimestamp(  ) );
                 resourceHistory.setUserAccessCode( NotifyDirectoryConstants.USER_AUTO );
-                ResourceHistoryHome.create( resourceHistory, plugin );
+                _resourceHistoryService.create( resourceHistory );
 
                 // Update Resource
-                ResourceWorkflow resourceWorkflow = ResourceWorkflowHome.findByPrimaryKey( resourceKey.getIdResource(  ),
-                        resourceKey.getResourceType(  ), action.getWorkflow(  ).getId(  ), pluginWorkflow );
+                ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( resourceKey.getIdResource(  ),
+                        resourceKey.getResourceType(  ), action.getWorkflow(  ).getId(  ) );
                 resourceWorkflow.setState( state );
-                ResourceWorkflowHome.update( resourceWorkflow, pluginWorkflow );
+                _resourceWorkflowService.update( resourceWorkflow );
 
-                //Delete ResourceKey
-                ResourceKeyHome.remove( resourceKey.getKey(  ), pluginWorkflow );
+                // Delete ResourceKey
+                _resourceKeyService.remove( resourceKey.getKey(  ), plugin );
 
                 //if new state have action automatic
                 WorkflowService.getInstance(  )

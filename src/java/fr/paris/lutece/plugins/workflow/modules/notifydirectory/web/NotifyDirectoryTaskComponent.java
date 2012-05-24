@@ -31,25 +31,21 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
+package fr.paris.lutece.plugins.workflow.modules.notifydirectory.web;
 
-import fr.paris.lutece.plugins.directory.business.Directory;
-import fr.paris.lutece.plugins.directory.business.DirectoryHome;
-import fr.paris.lutece.plugins.directory.business.Record;
-import fr.paris.lutece.plugins.directory.business.RecordHome;
-import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistory;
-import fr.paris.lutece.plugins.workflow.business.ResourceHistoryHome;
-import fr.paris.lutece.plugins.workflow.business.task.Task;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.NotificationTypeEnum;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.INotifyDirectoryService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ITaskNotifyDirectoryConfigService;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
-import fr.paris.lutece.plugins.workflow.service.security.WorkflowUserAttributesManager;
+import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -57,9 +53,7 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.mail.FileAttachment;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -69,32 +63,34 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * TaskNotifyDirectory
+ * INotifyDirectoryTaskComponent
  *
  */
-public class TaskNotifyDirectory extends Task
+public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
 {
-    // Templates
+    // TEMPLATES
     private static final String TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG = "admin/plugins/workflow/modules/notifydirectory/task_notify_directory_config.html";
-    private static final String TEMPLATE_TASK_NOTIFY_MAIL = "admin/plugins/workflow/modules/notifydirectory/task_notify_directory_mail.html";
-    private static final String TEMPLATE_TASK_NOTIFY_SMS = "admin/plugins/workflow/modules/notifydirectory/task_notify_directory_sms.html";
+
+    // SERVICES
+    @Inject
+    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryConfigService;
+    @Inject
+    private INotifyDirectoryService _notifyDirectoryService;
+    @Inject
+    private IWorkflowUserAttributesManager _userAttributesManager;
 
     /**
      * {@inheritDoc}
      */
-    public void init(  )
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String doSaveConfig( HttpServletRequest request, Locale locale, Plugin plugin )
+    @Override
+    public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
     {
         int nNotify = DirectoryUtils.convertStringToInt( request.getParameter( 
                     NotifyDirectoryConstants.PARAMETER_NOTIFY ) );
@@ -217,14 +213,14 @@ public class TaskNotifyDirectory extends Task
                 tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
-                                                                           .findByPrimaryKey( this.getId(  ), plugin );
+        Plugin plugin = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ), plugin );
         Boolean bCreate = false;
 
         if ( config == null )
         {
             config = new TaskNotifyDirectoryConfig(  );
-            config.setIdTask( this.getId(  ) );
+            config.setIdTask( task.getId(  ) );
             bCreate = true;
         }
 
@@ -291,11 +287,11 @@ public class TaskNotifyDirectory extends Task
 
         if ( bCreate )
         {
-            TaskNotifyDirectoryConfigService.getService(  ).create( config, plugin );
+            _taskNotifyDirectoryConfigService.create( config, plugin );
         }
         else
         {
-            TaskNotifyDirectoryConfigService.getService(  ).update( config, plugin );
+            _taskNotifyDirectoryConfigService.update( config, plugin );
         }
 
         return null;
@@ -304,20 +300,11 @@ public class TaskNotifyDirectory extends Task
     /**
      * {@inheritDoc}
      */
-    public String doValidateTask( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale,
-        Plugin plugin )
+    @Override
+    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDisplayConfigForm( HttpServletRequest request, Plugin plugin, Locale locale )
-    {
-        NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
-        TaskNotifyDirectoryConfigService configService = TaskNotifyDirectoryConfigService.getService(  );
-        TaskNotifyDirectoryConfig config = configService.findByPrimaryKey( getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ),
+                PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME ) );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME );
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
@@ -327,20 +314,19 @@ public class TaskNotifyDirectory extends Task
         model.put( NotifyDirectoryConstants.MARK_CONFIG, config );
         model.put( NotifyDirectoryConstants.MARK_DEFAULT_SENDER_NAME, strDefaultSenderName );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_EMAIL_SMS,
-            notifyDirectoryService.getListEntriesEmailSMS( getId(  ), locale ) );
+            _notifyDirectoryService.getListEntriesEmailSMS( task.getId(  ), locale ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FREEMARKER,
-            notifyDirectoryService.getListEntriesFreemarker( getId(  ) ) );
-        model.put( NotifyDirectoryConstants.MARK_DIRECTORY_LIST, notifyDirectoryService.getListDirectories(  ) );
+            _notifyDirectoryService.getListEntriesFreemarker( task.getId(  ) ) );
+        model.put( NotifyDirectoryConstants.MARK_DIRECTORY_LIST, _notifyDirectoryService.getListDirectories(  ) );
         model.put( NotifyDirectoryConstants.MARK_STATE_LIST,
-            notifyDirectoryService.getListStates( getAction(  ).getId(  ) ) );
+            _notifyDirectoryService.getListStates( task.getAction(  ).getId(  ) ) );
         model.put( NotifyDirectoryConstants.MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( NotifyDirectoryConstants.MARK_LOCALE, request.getLocale(  ) );
-        model.put( NotifyDirectoryConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE,
-            WorkflowUserAttributesManager.getManager(  ).isEnabled(  ) );
+        model.put( NotifyDirectoryConstants.MARK_IS_USER_ATTRIBUTE_WS_ACTIVE, _userAttributesManager.isEnabled(  ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_USER_GUID,
-            notifyDirectoryService.getListEntriesUserGuid( getId(  ), locale ) );
+            _notifyDirectoryService.getListEntriesUserGuid( task.getId(  ), locale ) );
         model.put( NotifyDirectoryConstants.MARK_LIST_ENTRIES_FILE,
-            notifyDirectoryService.getListEntriesFile( getId(  ), locale ) );
+            _notifyDirectoryService.getListEntriesFile( task.getId(  ), locale ) );
 
         if ( config != null )
         {
@@ -348,10 +334,10 @@ public class TaskNotifyDirectory extends Task
                 config.getListPositionEntryFile(  ) );
         }
 
-        model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, notifyDirectoryService.getMailingList( request ) );
+        model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, _notifyDirectoryService.getMailingList( request ) );
         model.put( NotifyDirectoryConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
         model.put( NotifyDirectoryConstants.MARK_TASKS_LIST,
-            notifyDirectoryService.getListTasks( getAction(  ).getId(  ), locale ) );
+            _notifyDirectoryService.getListTasks( task.getAction(  ).getId(  ), locale ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG, locale, model );
 
@@ -361,165 +347,20 @@ public class TaskNotifyDirectory extends Task
     /**
      * {@inheritDoc}
      */
-    public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request,
-        Plugin plugin, Locale locale )
+    @Override
+    public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
+        // TODO Auto-generated method stub
         return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
+    @Override
+    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
+        // TODO Auto-generated method stub
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void processTask( int nIdResourceHistory, HttpServletRequest request, Plugin plugin, Locale locale )
-    {
-        ResourceHistory resourceHistory = ResourceHistoryHome.findByPrimaryKey( nIdResourceHistory, plugin );
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
-                                                                           .findByPrimaryKey( this.getId(  ), plugin );
-
-        if ( ( config != null ) && ( resourceHistory != null ) &&
-                Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
-        {
-            NotifyDirectoryService notifyDirectoryService = NotifyDirectoryService.getService(  );
-            Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-
-            // Record
-            Record record = RecordHome.findByPrimaryKey( resourceHistory.getIdResource(  ), pluginDirectory );
-
-            if ( record != null )
-            {
-                Directory directory = DirectoryHome.findByPrimaryKey( record.getDirectory(  ).getIdDirectory(  ),
-                        pluginDirectory );
-
-                if ( directory != null )
-                {
-                    record.setDirectory( directory );
-
-                    // Get email
-                    String strEmail = notifyDirectoryService.getEmail( config, record.getIdRecord(  ),
-                            directory.getIdDirectory(  ) );
-                    String strEmailContent = StringUtils.EMPTY;
-
-                    // Get Sms
-                    String strSms = notifyDirectoryService.getSMSPhoneNumber( config, record.getIdRecord(  ),
-                            directory.getIdDirectory(  ) );
-                    String strSmsContent = StringUtils.EMPTY;
-
-                    //Get Files Attachment
-                    List<FileAttachment> listFileAttachment = notifyDirectoryService.getFilesAttachment( config,
-                            record.getIdRecord(  ), directory.getIdDirectory(  ) );
-
-                    // Get sender email
-                    String strSenderEmail = MailService.getNoReplyEmail(  );
-
-                    Map<String, Object> model = notifyDirectoryService.fillModel( config, resourceHistory, record,
-                            directory, request, getAction(  ).getId(  ), nIdResourceHistory );
-
-                    String strSubject = AppTemplateService.getTemplateFromStringFtl( config.getSubject(  ), locale,
-                            model ).getHtml(  );
-
-                    boolean bIsNotifyByEmail = config.isNotifyByEmail(  ) && StringUtils.isNotBlank( strEmail );
-                    boolean bIsNotifyBySms = config.isNotifyBySms(  ) && StringUtils.isNotBlank( strSms );
-                    boolean bIsNotifyByMailingList = config.isNotifyByMailingList(  );
-                    boolean bHasRecipients = ( StringUtils.isNotBlank( config.getRecipientsBcc(  ) ) ||
-                        StringUtils.isNotBlank( config.getRecipientsCc(  ) ) );
-
-                    if ( bIsNotifyByEmail || bIsNotifyByMailingList || bHasRecipients )
-                    {
-                        HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                                    TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
-                        strEmailContent = t.getHtml(  );
-                    }
-
-                    if ( bIsNotifyBySms )
-                    {
-                        HtmlTemplate tSMS = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                                    TEMPLATE_TASK_NOTIFY_SMS, locale, model ).getHtml(  ), locale, model );
-                        strSmsContent = tSMS.toString(  );
-                    }
-
-                    notifyDirectoryService.sendMessage( config, strEmail, strSms, strSenderEmail, strSubject,
-                        strEmailContent, strSmsContent, listFileAttachment );
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void doRemoveConfig( Plugin plugin )
-    {
-        TaskNotifyDirectoryConfigService.getService(  ).remove( this.getId(  ), plugin );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isConfigRequire(  )
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isFormTaskRequire(  )
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void doRemoveTaskInformation( int nIdHistory, Plugin plugin )
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Plugin plugin, Locale locale )
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getTitle( Plugin plugin, Locale locale )
-    {
-        TaskNotifyDirectoryConfig config = TaskNotifyDirectoryConfigService.getService(  )
-                                                                           .findByPrimaryKey( this.getId(  ), plugin );
-
-        if ( config != null )
-        {
-            return config.getSubject(  );
-        }
-
-        return WorkflowUtils.EMPTY_STRING;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ReferenceList getTaskFormEntries( Plugin plugin, Locale locale )
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isTaskForActionAutomatic(  )
-    {
-        return true;
     }
 }

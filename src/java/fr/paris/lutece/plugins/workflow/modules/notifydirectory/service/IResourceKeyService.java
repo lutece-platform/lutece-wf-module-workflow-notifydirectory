@@ -31,40 +31,60 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.cleaner;
+package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
-import fr.paris.lutece.plugins.directory.business.RecordHome;
-import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.IResourceKeyService;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ResourceKeyService;
-import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
  *
- * Daemon DaemonCleanerNotify
+ * IResourceKeyService
  *
  */
-public class DaemonCleanerNotify extends Daemon
+public interface IResourceKeyService
 {
     /**
-     * Run service DaemonCleanerNotify
-     */
-    public void run(  )
-    {
-        Plugin pluginNotifyDirectory = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
-        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        IResourceKeyService resourceKeyService = SpringContextService.getBean( ResourceKeyService.BEAN_SERVICE );
+    * Insert new resourceKey
+    * @param resourceKey object ResourceKey
+    * @param plugin the plugin
+    */
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void create( ResourceKey resourceKey, Plugin plugin );
 
-        for ( ResourceKey resourceKey : resourceKeyService.selectResourceExpiry( pluginNotifyDirectory ) )
-        {
-            RecordHome.remove( resourceKey.getIdResource(  ), pluginDirectory );
-            resourceKeyService.remove( resourceKey.getKey(  ), pluginNotifyDirectory );
-        }
-    }
+    /**
+     * Update a ResourceKey
+     *
+     * @param resourceKey object ResourceKey
+     * @param plugin the plugin
+     */
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void update( ResourceKey resourceKey, Plugin plugin );
+
+    /**
+     * Delete a ResourceKey
+     * @param strKey key
+     * @param plugin the plugin
+     */
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void remove( String strKey, Plugin plugin );
+
+    /**
+     * Delete a ResourceKey
+     * @param strKey key
+     * @param plugin the plugin
+     * @return a ResourceKey
+     */
+    ResourceKey findByPrimaryKey( String strKey, Plugin plugin );
+
+    /**
+     * Delete a ResourceKey expiry
+     * @param plugin the plugin
+     * @return a list of {@link ResourceKey}
+     */
+    List<ResourceKey> selectResourceExpiry( Plugin plugin );
 }

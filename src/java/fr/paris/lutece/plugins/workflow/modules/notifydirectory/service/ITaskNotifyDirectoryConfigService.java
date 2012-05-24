@@ -31,45 +31,59 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.cleaner;
+package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
-import fr.paris.lutece.plugins.directory.business.RecordHome;
-import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyHome;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
  *
- * CleanerNotifyService
+ * ITaskNotifyDirectoryConfigService
  *
  */
-public final class CleanerNotifyService
+public interface ITaskNotifyDirectoryConfigService
 {
     /**
-     * CleanerNotifyService
-     *
-     */
-    private CleanerNotifyService(  )
-    {
-    }
+    * Create a new config
+    * @param plugin the Plugin
+    * @param config the config
+    */
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void create( TaskNotifyDirectoryConfig config, Plugin plugin );
 
     /**
-     *Clean the ResourceKey expiry
-     *
+     * Update a config
+     * @param plugin the Plugin
+     * @param config the config
      */
-    public static void cleaner(  )
-    {
-        Plugin pluginNotifyDirectory = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
-        Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void update( TaskNotifyDirectoryConfig config, Plugin plugin );
 
-        for ( ResourceKey resourceKey : ResourceKeyHome.selectResourceExpiry( pluginNotifyDirectory ) )
-        {
-            RecordHome.remove( resourceKey.getIdResource(  ), pluginDirectory );
-            ResourceKeyHome.remove( resourceKey.getKey(  ), pluginNotifyDirectory );
-        }
-    }
+    /**
+     * Remove a config
+     * @param plugin the Plugin
+     * @param nIdTask the task id
+     */
+    @Transactional( "workflow-notifydirectory.transactionManager" )
+    void remove( int nIdTask, Plugin plugin );
+
+    /**
+     * Find a config
+     * @param nIdTask the id task
+     * @param plugin the Plugin
+     * @return an instance of {@link TaskNotifyDirectoryConfig}
+     */
+    TaskNotifyDirectoryConfig findByPrimaryKey( int nIdTask, Plugin plugin );
+
+    /**
+     * Get all configs
+     * @param plugin the Plugin
+     * @return a list of {@link TaskNotifyDirectoryConfig}
+     */
+    List<TaskNotifyDirectoryConfig> findAll( Plugin plugin );
 }

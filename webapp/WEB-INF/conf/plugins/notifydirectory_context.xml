@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-<beans>
- 	 <bean id="taskNotifyDirectoryConfigDAO"  class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigDAO"/>
- 	 <bean id="taskNotifyDirectoryResourceKeyDAO"  class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyDAO"/>
- 	 
- 	 <bean id="workflow-notifydirectory.taskNotifyDirectory" class="fr.paris.lutece.plugins.workflow.business.task.TaskType" >
- 	 		<property name="key" value="taskNotifyDirectory" />
-     		 <property name="titleI18nKey" value="module.workflow.notifydirectory.task_notify_directory_title" />
-    		 <property name="className" value="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectory"/>
-   	  </bean>
-   	  
-   	  <!-- Service -->
-   	  <bean id="workflow-notifydirectory.notifyDirectoryService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService" />
-   	  <bean id="workflow-notifydirectory.taskNotifyDirectoryConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService" />
+	<!-- Transaction Manager -->
+	<bean id="workflow-notifydirectory.transactionManager" class="fr.paris.lutece.portal.service.database.DAOUtilTransactionManager"
+		p:pluginName="workflow-notifydirectory" />
+	
+	<!-- DAO -->
+	<bean id="taskNotifyDirectoryConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigDAO"/>
+ 	<bean id="taskNotifyDirectoryResourceKeyDAO" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyDAO"/>
+	
+	<!-- Task -->
+ 	<bean id="workflow-notifydirectory.taskTypeNotifyDirectory" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+ 		p:key="taskNotifyDirectory"
+ 		p:titleI18nKey="module.workflow.notifydirectory.task_notify_directory_title"
+ 		p:beanName="workflow-notifydirectory.taskNotifyDirectory"
+ 		p:configRequired="true"
+ 		p:taskForAutomaticAction="true" />
+ 	<bean id="workflow-notifydirectory.taskNotifyDirectory" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectory" scope="prototype" />
+   	<bean id="workflow-notifydirectory.notifyDirectoryTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.web.NotifyDirectoryTaskComponent"
+   		p:taskType-ref="workflow-notifydirectory.taskTypeNotifyDirectory" />
+   	
+   	<!-- Service -->
+   	<bean id="workflow-notifydirectory.notifyDirectoryService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService" />
+   	<bean id="workflow-notifydirectory.taskNotifyDirectoryConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService" />
+   	<bean id="workflow-notifydirectory.resourceKeyService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ResourceKeyService" />
 </beans>
  	
