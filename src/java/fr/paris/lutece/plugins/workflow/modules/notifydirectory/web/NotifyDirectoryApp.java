@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.workflow.modules.notifydirectory.web;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKey;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.IResourceKeyService;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ITaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ResourceKeyService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
@@ -47,6 +46,7 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryService;
@@ -92,7 +92,7 @@ public class NotifyDirectoryApp implements XPageApplication
     // SERVICES
     private IResourceKeyService _resourceKeyService = SpringContextService.getBean( ResourceKeyService.BEAN_SERVICE );
     private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
-    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryConfigService = SpringContextService.getBean( TaskNotifyDirectoryConfigService.BEAN_SERVICE );
+    private ITaskConfigService _taskNotifyDirectoryConfigService = SpringContextService.getBean( TaskNotifyDirectoryConfigService.BEAN_SERVICE );
     private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
     private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
     private IResourceHistoryService _resourceHistoryService = SpringContextService.getBean( ResourceHistoryService.BEAN_SERVICE );
@@ -140,8 +140,7 @@ public class NotifyDirectoryApp implements XPageApplication
             if ( ( resourceKey != null ) && currentDate.before( resourceKey.getDateExpiry(  ) ) )
             {
                 ITask task = _taskService.findByPrimaryKey( resourceKey.getIdTask(  ), locale );
-                TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ),
-                        plugin );
+                TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ) );
 
                 State state = _stateService.findByPrimaryKey( config.getIdStateAfterValidation(  ) );
                 Action action = _actionService.findByPrimaryKey( task.getAction(  ).getId(  ) );

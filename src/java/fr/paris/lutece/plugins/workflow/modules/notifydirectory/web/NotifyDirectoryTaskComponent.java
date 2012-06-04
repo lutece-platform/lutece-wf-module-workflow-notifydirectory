@@ -37,14 +37,14 @@ import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.NotificationTypeEnum;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.INotifyDirectoryService;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ITaskNotifyDirectoryConfigService;
-import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.utils.constants.NotifyDirectoryConstants;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.service.security.IWorkflowUserAttributesManager;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.plugins.workflowcore.web.task.NoFormTaskComponent;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -64,6 +64,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -80,7 +81,8 @@ public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
 
     // SERVICES
     @Inject
-    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryConfigService;
+    @Named( TaskNotifyDirectoryConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyDirectoryConfigService;
     @Inject
     private INotifyDirectoryService _notifyDirectoryService;
     @Inject
@@ -213,8 +215,7 @@ public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
                 tabRequiredFields, AdminMessage.TYPE_STOP );
         }
 
-        Plugin plugin = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
-        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ) );
         Boolean bCreate = false;
 
         if ( config == null )
@@ -287,11 +288,11 @@ public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
 
         if ( bCreate )
         {
-            _taskNotifyDirectoryConfigService.create( config, plugin );
+            _taskNotifyDirectoryConfigService.create( config );
         }
         else
         {
-            _taskNotifyDirectoryConfigService.update( config, plugin );
+            _taskNotifyDirectoryConfigService.update( config );
         }
 
         return null;
@@ -303,8 +304,7 @@ public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ),
-                PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME ) );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( task.getId(  ) );
 
         String strDefaultSenderName = AppPropertiesService.getProperty( NotifyDirectoryConstants.PROPERTY_NOTIFY_MAIL_DEFAULT_SENDER_NAME );
         Plugin pluginWorkflow = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );

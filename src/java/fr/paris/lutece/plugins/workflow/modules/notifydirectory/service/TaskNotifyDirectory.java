@@ -40,6 +40,7 @@ import fr.paris.lutece.plugins.directory.business.RecordHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.mail.MailService;
@@ -56,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -75,7 +77,8 @@ public class TaskNotifyDirectory extends SimpleTask
     @Inject
     private IResourceHistoryService _resourceHistoryService;
     @Inject
-    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryConfigService;
+    @Named( TaskNotifyDirectoryConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyDirectoryConfigService;
     @Inject
     private INotifyDirectoryService _notifyDirectoryService;
 
@@ -85,9 +88,8 @@ public class TaskNotifyDirectory extends SimpleTask
     @Override
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
     {
-        Plugin plugin = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdResourceHistory );
-        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( this.getId(  ), plugin );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( this.getId(  ) );
 
         if ( ( config != null ) && ( resourceHistory != null ) &&
                 Record.WORKFLOW_RESOURCE_TYPE.equals( resourceHistory.getResourceType(  ) ) )
@@ -162,8 +164,7 @@ public class TaskNotifyDirectory extends SimpleTask
     @Override
     public void doRemoveConfig(  )
     {
-        _taskNotifyDirectoryConfigService.remove( this.getId(  ),
-            PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME ) );
+        _taskNotifyDirectoryConfigService.remove( this.getId(  ) );
     }
 
     /**
@@ -172,8 +173,7 @@ public class TaskNotifyDirectory extends SimpleTask
     @Override
     public String getTitle( Locale locale )
     {
-        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( this.getId(  ),
-                PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME ) );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( this.getId(  ) );
 
         if ( config != null )
         {

@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.util.ArrayList;
@@ -56,8 +56,6 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
         " SET id_task = ?, id_directory = ?, position_directory_entry_email = ?, position_directory_entry_sms = ?, position_directory_entry_user_guid = ?, sender_name = ?, subject = ?, message = ?, is_notify_by_email = ?, is_notify_by_sms = ?, is_notify_by_mailing_list = ?, is_notify_by_user_guid = ?,is_email_validation = ?, id_state_after_validation = ?, label_link = ?, message_validation = ?, period_validity = ?, recipients_cc = ?, recipients_bcc = ?, id_mailing_list = ?, is_view_record = ?, label_link_view_record = ? " +
         " WHERE id_task = ? ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM task_notify_directory_cf WHERE id_task = ? ";
-    private static final String SQL_QUERY_FIND_ALL = "SELECT id_task,id_directory,position_directory_entry_email,position_directory_entry_sms,position_directory_entry_user_guid,sender_name,subject,message,is_notify_by_email,is_notify_by_sms,is_notify_by_mailing_list,is_notify_by_user_guid,is_email_validation,id_state_after_validation,label_link,message_validation,period_validity,recipients_cc,recipients_bcc,id_mailing_list,is_view_record,label_link_view_record " +
-        "FROM task_notify_directory_cf";
     private static final String SQL_QUERY_DELETE_POSITION_ENTRY_FILE = "DELETE FROM task_notify_directory_ef where id_task= ? ";
     private static final String SQL_QUERY_INSERT_POSITION_ENTRY_FILE = "INSERT INTO task_notify_directory_ef( " +
         "id_task,position_directory_entry_file) VALUES (?,?) ";
@@ -68,9 +66,9 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( TaskNotifyDirectoryConfig config, Plugin plugin )
+    public synchronized void insert( TaskNotifyDirectoryConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, NotifyDirectoryPlugin.getPlugin(  ) );
 
         int nPos = 0;
 
@@ -105,9 +103,9 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public void store( TaskNotifyDirectoryConfig config, Plugin plugin )
+    public void store( TaskNotifyDirectoryConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, NotifyDirectoryPlugin.getPlugin(  ) );
 
         int nPos = 0;
 
@@ -143,10 +141,10 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public TaskNotifyDirectoryConfig load( int nIdTask, Plugin plugin )
+    public TaskNotifyDirectoryConfig load( int nIdTask )
     {
         TaskNotifyDirectoryConfig config = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, NotifyDirectoryPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
 
@@ -190,9 +188,9 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public void delete( int nIdState, Plugin plugin )
+    public void delete( int nIdState )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, NotifyDirectoryPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdState );
         daoUtil.executeUpdate(  );
@@ -203,56 +201,10 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public List<TaskNotifyDirectoryConfig> loadAll( Plugin plugin )
-    {
-        List<TaskNotifyDirectoryConfig> configList = new ArrayList<TaskNotifyDirectoryConfig>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ALL, plugin );
-
-        daoUtil.executeQuery(  );
-
-        int nPos = 0;
-
-        if ( daoUtil.next(  ) )
-        {
-            TaskNotifyDirectoryConfig config = new TaskNotifyDirectoryConfig(  );
-            config.setIdTask( daoUtil.getInt( ++nPos ) );
-            config.setIdDirectory( daoUtil.getInt( ++nPos ) );
-            config.setPositionEntryDirectoryEmail( daoUtil.getInt( ++nPos ) );
-            config.setPositionEntryDirectorySms( daoUtil.getInt( ++nPos ) );
-            config.setPositionEntryDirectoryUserGuid( daoUtil.getInt( ++nPos ) );
-            config.setSenderName( daoUtil.getString( ++nPos ) );
-            config.setSubject( daoUtil.getString( ++nPos ) );
-            config.setMessage( daoUtil.getString( ++nPos ) );
-            config.setNotifyByEmail( daoUtil.getBoolean( ++nPos ) );
-            config.setNotifyBySms( daoUtil.getBoolean( ++nPos ) );
-            config.setNotifyByMailingList( daoUtil.getBoolean( ++nPos ) );
-            config.setNotifyByUserGuid( daoUtil.getBoolean( ++nPos ) );
-            config.setEmailValidation( daoUtil.getBoolean( ++nPos ) );
-            config.setIdStateAfterValidation( daoUtil.getInt( ++nPos ) );
-            config.setLabelLink( daoUtil.getString( ++nPos ) );
-            config.setMessageValidation( daoUtil.getString( ++nPos ) );
-            config.setPeriodValidity( daoUtil.getInt( ++nPos ) );
-            config.setRecipientsCc( daoUtil.getString( ++nPos ) );
-            config.setRecipientsBcc( daoUtil.getString( ++nPos ) );
-            config.setIdMailingList( daoUtil.getInt( ++nPos ) );
-            config.setViewRecord( daoUtil.getBoolean( ++nPos ) );
-            config.setLabelLinkViewRecord( daoUtil.getString( ++nPos ) );
-            configList.add( config );
-        }
-
-        daoUtil.free(  );
-
-        return configList;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Integer> loadListPositionEntryFile( int nIdTask, Plugin plugin )
+    public List<Integer> loadListPositionEntryFile( int nIdTask )
     {
         List<Integer> listIntegerPositionEntryFile = new ArrayList<Integer>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_LIST_POSITION_ENTRY_FILE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_LIST_POSITION_ENTRY_FILE, NotifyDirectoryPlugin.getPlugin(  ) );
         daoUtil.setInt( 1, nIdTask );
         daoUtil.executeQuery(  );
 
@@ -270,9 +222,9 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public void deleteListPositionEntryFile( int nIdTask, Plugin plugin )
+    public void deleteListPositionEntryFile( int nIdTask )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_POSITION_ENTRY_FILE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_POSITION_ENTRY_FILE, NotifyDirectoryPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
         daoUtil.executeUpdate(  );
@@ -283,9 +235,9 @@ public class TaskNotifyDirectoryConfigDAO implements ITaskNotifyDirectoryConfigD
      * {@inheritDoc}
      */
     @Override
-    public void insertListPositionEntryFile( int nIdTask, Integer nPositionEntryFile, Plugin plugin )
+    public void insertListPositionEntryFile( int nIdTask, int nPositionEntryFile )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_POSITION_ENTRY_FILE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_POSITION_ENTRY_FILE, NotifyDirectoryPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
         daoUtil.setInt( 2, nPositionEntryFile );

@@ -33,7 +33,9 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
+import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 
 
 /**
@@ -44,13 +46,14 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 public class NotifyDirectoryPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "workflow-notifydirectory";
+    public static final String BEAN_TRANSACTION_MANAGER = PLUGIN_NAME + ".transactionManager";
 
     /**
-     * Initialise the exporttoentrydirectory
+     * Get the plugin
+     * @return the plugin
      */
-    public void init(  )
+    public static Plugin getPlugin(  )
     {
-        //ImageResourceManager
-        //FileImgService.getInstance().register();
+        return PluginService.getPlugin( PLUGIN_NAME );
     }
 }

@@ -35,7 +35,8 @@ package fr.paris.lutece.plugins.workflow.modules.notifydirectory.service;
 
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ITaskNotifyDirectoryConfigDAO;
 import fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig;
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
+import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +50,7 @@ import javax.inject.Inject;
  * TaskNotifyDirectoryConfigService
  *
  */
-public class TaskNotifyDirectoryConfigService implements ITaskNotifyDirectoryConfigService
+public class TaskNotifyDirectoryConfigService extends TaskConfigService
 {
     public static final String BEAN_SERVICE = "workflow-notifydirectory.taskNotifyDirectoryConfigService";
     @Inject
@@ -59,12 +60,19 @@ public class TaskNotifyDirectoryConfigService implements ITaskNotifyDirectoryCon
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
-    public void create( TaskNotifyDirectoryConfig config, Plugin plugin )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
+    public void create( ITaskConfig config )
     {
-        if ( config != null )
+        super.create( config );
+
+        TaskNotifyDirectoryConfig notifyConfig = getConfigBean( config );
+
+        if ( ( notifyConfig != null ) && ( notifyConfig.getListPositionEntryFile(  ) != null ) )
         {
-            _taskNotifyDirectoryConfigDAO.insert( config, plugin );
+            for ( int nPositionEntryFile : notifyConfig.getListPositionEntryFile(  ) )
+            {
+                this.createPositionEntryFile( config.getIdTask(  ), nPositionEntryFile );
+            }
         }
     }
 
@@ -72,12 +80,26 @@ public class TaskNotifyDirectoryConfigService implements ITaskNotifyDirectoryCon
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
-    public void update( TaskNotifyDirectoryConfig config, Plugin plugin )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
+    public void update( ITaskConfig config )
     {
-        if ( config != null )
+        super.update( config );
+
+        TaskNotifyDirectoryConfig notifyConfig = getConfigBean( config );
+
+        if ( notifyConfig != null )
         {
-            _taskNotifyDirectoryConfigDAO.store( config, plugin );
+            // First remove the links task - entries file
+            this.removeListPositionEntryFile( config.getIdTask(  ) );
+
+            // Then add the links
+            if ( notifyConfig.getListPositionEntryFile(  ) != null )
+            {
+                for ( int nPositionEntryFile : notifyConfig.getListPositionEntryFile(  ) )
+                {
+                    this.createPositionEntryFile( config.getIdTask(  ), nPositionEntryFile );
+                }
+            }
         }
     }
 
@@ -85,27 +107,60 @@ public class TaskNotifyDirectoryConfigService implements ITaskNotifyDirectoryCon
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
-    public void remove( int nIdTask, Plugin plugin )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
+    public void remove( int nIdTask )
     {
-        _taskNotifyDirectoryConfigDAO.delete( nIdTask, plugin );
+        super.remove( nIdTask );
+        this.removeListPositionEntryFile( nIdTask );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public TaskNotifyDirectoryConfig findByPrimaryKey( int nIdTask, Plugin plugin )
+    public <T> T findByPrimaryKey( int nIdTask )
     {
-        return _taskNotifyDirectoryConfigDAO.load( nIdTask, plugin );
+        TaskNotifyDirectoryConfig config = super.findByPrimaryKey( nIdTask );
+
+        if ( config != null )
+        {
+            List<Integer> listPositionEntryFile = findPositionEntryFile( nIdTask );
+
+            if ( ( listPositionEntryFile != null ) && !listPositionEntryFile.isEmpty(  ) )
+            {
+                config.setListPositionEntryFile( listPositionEntryFile );
+            }
+        }
+
+        return (T) config;
     }
 
     /**
-     * {@inheritDoc}
+     * Find the positions entry file from a given id task
+     * @param nIdTask the id task
+     * @return a list of position
      */
-    @Override
-    public List<TaskNotifyDirectoryConfig> findAll( Plugin plugin )
+    private List<Integer> findPositionEntryFile( int nIdTask )
     {
-        return _taskNotifyDirectoryConfigDAO.loadAll( plugin );
+        return _taskNotifyDirectoryConfigDAO.loadListPositionEntryFile( nIdTask );
+    }
+
+    /**
+     * Create the link task - entry file
+     * @param nIdTask the id task
+     * @param nPositionEntryFile the position entry file
+     */
+    private void createPositionEntryFile( int nIdTask, int nPositionEntryFile )
+    {
+        _taskNotifyDirectoryConfigDAO.insertListPositionEntryFile( nIdTask, nPositionEntryFile );
+    }
+
+    /**
+     * Remove all links task - entry file
+     * @param nIdTask the id task
+     */
+    private void removeListPositionEntryFile( int nIdTask )
+    {
+        _taskNotifyDirectoryConfigDAO.deleteListPositionEntryFile( nIdTask );
     }
 }

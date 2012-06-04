@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 
 import java.util.List;
 
@@ -43,67 +43,25 @@ import java.util.List;
  * ITaskNotifyDirectoryConfigDAO
  *
  */
-public interface ITaskNotifyDirectoryConfigDAO
+public interface ITaskNotifyDirectoryConfigDAO extends ITaskConfigDAO<TaskNotifyDirectoryConfig>
 {
-    /**
-     * Insere une nouvelle configuration de type evaluation
-     *
-     * @param config l objet configuration
-     * @param plugin the plugin
-     */
-    void insert( TaskNotifyDirectoryConfig config, Plugin plugin );
-
-    /**
-     * met à jour une configuration de type evaluation
-     *
-     * @param  config instance of config object to update
-     * @param plugin the plugin
-     */
-    void store( TaskNotifyDirectoryConfig config, Plugin plugin );
-
-    /**
-     * charge une configuration de type evaluation
-     * @param nIdConfig the config id
-     * @param plugin the plugin
-     * @return une configuration
-     *
-     */
-    TaskNotifyDirectoryConfig load( int nIdConfig, Plugin plugin );
-
-    /**
-     * Supprime une configuration de type evaluation
-     * @param nIdConfig l identifiant de la configuration
-     * @param plugin le plugin
-     */
-    void delete( int nIdConfig, Plugin plugin );
-
-    /**
-     *
-     * @param plugin le plugin
-     * @return List of TaskNotifyDirectoryConfig
-     */
-    List<TaskNotifyDirectoryConfig> loadAll( Plugin plugin );
-
     /**
      * Load the position of entry file which must insert in attachment mail
      * @param nIdTask the id task
-     * @param plugin the plugin
      * @return the position of entry file which must insert in attachment mail
      */
-    List<Integer> loadListPositionEntryFile( int nIdTask, Plugin plugin );
+    List<Integer> loadListPositionEntryFile( int nIdTask );
 
     /**
      * Delete all position of entry file which must insert in attachment mail
      * @param nIdTask the id task
-     * @param plugin the plugin
      */
-    void deleteListPositionEntryFile( int nIdTask, Plugin plugin );
+    void deleteListPositionEntryFile( int nIdTask );
 
     /**
      * insert entry file which must insert in attachment mail
      * @param nIdTask the id task
      * @param nPositionEntryFile the entry file
-     * @param plugin the plugin
      */
-    void insertListPositionEntryFile( int nIdTask, Integer nPositionEntryFile, Plugin plugin );
+    void insertListPositionEntryFile( int nIdTask, int nPositionEntryFile );
 }

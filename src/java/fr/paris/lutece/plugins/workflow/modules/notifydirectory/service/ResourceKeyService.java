@@ -59,7 +59,7 @@ public class ResourceKeyService implements IResourceKeyService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     public void create( ResourceKey resourceKey, Plugin plugin )
     {
         _resourceKeyDAO.insert( resourceKey, plugin );
@@ -69,7 +69,7 @@ public class ResourceKeyService implements IResourceKeyService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     public void update( ResourceKey resourceKey, Plugin plugin )
     {
         _resourceKeyDAO.store( resourceKey, plugin );
@@ -79,7 +79,7 @@ public class ResourceKeyService implements IResourceKeyService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     public void remove( String strKey, Plugin plugin )
     {
         _resourceKeyDAO.delete( strKey, plugin );

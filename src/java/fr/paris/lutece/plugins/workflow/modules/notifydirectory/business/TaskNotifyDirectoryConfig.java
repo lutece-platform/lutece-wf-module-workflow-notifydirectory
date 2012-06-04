@@ -33,7 +33,12 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.notifydirectory.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
+
 import java.util.List;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -41,9 +46,10 @@ import java.util.List;
  * TaskNotifyDirectoryConfig
  *
  */
-public class TaskNotifyDirectoryConfig
+public class TaskNotifyDirectoryConfig extends TaskConfig
 {
-    private int _nIdTask;
+    @NotNull
+    @Min( 1 )
     private int _nIdDirectory;
     private int _nPositionEntryDirectoryEmail;
     private int _nPositionEntryDirectorySms;
@@ -66,24 +72,6 @@ public class TaskNotifyDirectoryConfig
     private boolean _bViewRecord;
     private String _strLabelLinkViewRecord;
     private List<Integer> _listPositionEntryFile;
-
-    /**
-     * Get the id task
-     * @return id Task
-     */
-    public int getIdTask(  )
-    {
-        return _nIdTask;
-    }
-
-    /**
-     * Set id Task
-     * @param idTask id task
-     */
-    public void setIdTask( int idTask )
-    {
-        _nIdTask = idTask;
-    }
 
     /**
     *

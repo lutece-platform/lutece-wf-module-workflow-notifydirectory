@@ -59,6 +59,7 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
@@ -94,6 +95,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -113,7 +115,8 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
     @Inject
     private IStateService _stateService;
     @Inject
-    private ITaskNotifyDirectoryConfigService _taskNotifyDirectoryService;
+    @Named( TaskNotifyDirectoryConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskNotifyDirectoryService;
     @Inject
     private IWorkflowUserAttributesManager _userAttributesManager;
     @Inject
@@ -273,10 +276,9 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
     @Override
     public List<IEntry> getListEntries( int nIdTask )
     {
-        Plugin pluginNotifyDirectory = PluginService.getPlugin( NotifyDirectoryPlugin.PLUGIN_NAME );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
-        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryService.findByPrimaryKey( nIdTask, pluginNotifyDirectory );
+        TaskNotifyDirectoryConfig config = _taskNotifyDirectoryService.findByPrimaryKey( nIdTask );
 
         List<IEntry> listEntries = new ArrayList<IEntry>(  );
 

@@ -23,15 +23,19 @@
  		p:key="taskNotifyDirectory"
  		p:titleI18nKey="module.workflow.notifydirectory.task_notify_directory_title"
  		p:beanName="workflow-notifydirectory.taskNotifyDirectory"
+ 		p:configBeanName="workflow-notifydirectory.taskNotifyDirectoryConfig"
  		p:configRequired="true"
  		p:taskForAutomaticAction="true" />
  	<bean id="workflow-notifydirectory.taskNotifyDirectory" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectory" scope="prototype" />
+ 	<bean id="workflow-notifydirectory.taskNotifyDirectoryConfig" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfig" scope="prototype" />
    	<bean id="workflow-notifydirectory.notifyDirectoryTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.web.NotifyDirectoryTaskComponent"
-   		p:taskType-ref="workflow-notifydirectory.taskTypeNotifyDirectory" />
+   		p:taskType-ref="workflow-notifydirectory.taskTypeNotifyDirectory"
+   		p:taskConfigService-ref="workflow-notifydirectory.taskNotifyDirectoryConfigService" />
    	
    	<!-- Service -->
    	<bean id="workflow-notifydirectory.notifyDirectoryService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryService" />
-   	<bean id="workflow-notifydirectory.taskNotifyDirectoryConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService" />
+   	<bean id="workflow-notifydirectory.taskNotifyDirectoryConfigService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.TaskNotifyDirectoryConfigService"
+   		p:taskConfigDAO-ref="taskNotifyDirectoryConfigDAO" />
    	<bean id="workflow-notifydirectory.resourceKeyService" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.ResourceKeyService" />
 </beans>
  	

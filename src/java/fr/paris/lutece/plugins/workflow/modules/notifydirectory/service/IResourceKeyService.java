@@ -53,7 +53,7 @@ public interface IResourceKeyService
     * @param resourceKey object ResourceKey
     * @param plugin the plugin
     */
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     void create( ResourceKey resourceKey, Plugin plugin );
 
     /**
@@ -62,7 +62,7 @@ public interface IResourceKeyService
      * @param resourceKey object ResourceKey
      * @param plugin the plugin
      */
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     void update( ResourceKey resourceKey, Plugin plugin );
 
     /**
@@ -70,7 +70,7 @@ public interface IResourceKeyService
      * @param strKey key
      * @param plugin the plugin
      */
-    @Transactional( "workflow-notifydirectory.transactionManager" )
+    @Transactional( NotifyDirectoryPlugin.BEAN_TRANSACTION_MANAGER )
     void remove( String strKey, Plugin plugin );
 
     /**
