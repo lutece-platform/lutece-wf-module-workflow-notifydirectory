@@ -107,6 +107,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class NotifyDirectoryService implements INotifyDirectoryService
 {
+    /** The Constant BEAN_SERVICE. */
     public static final String BEAN_SERVICE = "workflow-notifydirectory.notifyDirectoryService";
 
     // SERVICES
@@ -595,7 +596,9 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
                 continue;
             }
             else if ( recordField.getEntry(  ) instanceof fr.paris.lutece.plugins.directory.business.EntryTypeGeolocation &&
-                    !recordField.getField(  ).getTitle(  ).equals( EntryTypeGeolocation.CONSTANT_ADDRESS ) )
+                    ( ( recordField.getField(  ) == null ) ||
+                    StringUtils.isBlank( recordField.getField(  ).getTitle(  ) ) ||
+                    !EntryTypeGeolocation.CONSTANT_ADDRESS.equals( recordField.getField(  ).getTitle(  ) ) ) )
             {
                 continue;
             }
