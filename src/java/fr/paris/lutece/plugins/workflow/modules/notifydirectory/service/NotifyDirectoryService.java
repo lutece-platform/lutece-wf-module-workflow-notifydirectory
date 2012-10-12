@@ -574,9 +574,12 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
     public Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory,
         Record record, Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory )
     {
+        Map<String, Object> model = new HashMap<String, Object>(  );
+
+        ITask task = this._taskService.findByPrimaryKey( config.getIdTask(  ), request.getLocale(  ) );
+
         Locale locale = getLocale( request );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        Map<String, Object> model = new HashMap<String, Object>(  );
 
         model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
         model.put( NotifyDirectoryConstants.MARK_DIRECTORY_TITLE, directory.getTitle(  ) );
@@ -730,11 +733,14 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
         String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
         fillModelWithUserAttributes( model, strUserGuid );
 
-        // Fill the model with the info of other tasks
-        for ( ITask task : getListTasks( nIdAction, locale ) )
+        if ( !task.getTaskType(  ).getKey(  ).equals( NotifyDirectoryConstants.TASK_NOTIFY_DIRECTORY_KEY ) )
         {
-            model.put( NotifyDirectoryConstants.MARK_TASK + task.getId(  ),
-                TaskInfoManager.getTaskResourceInfo( nIdHistory, task.getId(  ), request ) );
+            // Fill the model with the info of other tasks
+            for ( ITask otherTask : getListTasks( nIdAction, locale ) )
+            {
+                model.put( NotifyDirectoryConstants.MARK_TASK + otherTask.getId(  ),
+                    TaskInfoManager.getTaskResourceInfo( nIdHistory, otherTask.getId(  ), request ) );
+            }
         }
 
         return model;

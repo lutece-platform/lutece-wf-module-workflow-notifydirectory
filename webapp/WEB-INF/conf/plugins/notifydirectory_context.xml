@@ -13,7 +13,11 @@
 	<!-- Transaction Manager -->
 	<bean id="workflow-notifydirectory.transactionManager" class="fr.paris.lutece.portal.service.database.DAOUtilTransactionManager"
 		p:pluginName="workflow-notifydirectory" />
-	
+		
+	<!-- TaskInfoProvider -->
+	<bean id="workflow-notifydirectory.notifyDirectoryTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.taskinfo.NotifyDirectoryTaskInfoProvider"
+		p:taskType-ref="workflow-notifydirectory.taskTypeNotifyDirectory" />
+		
 	<!-- DAO -->
 	<bean id="taskNotifyDirectoryConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.TaskNotifyDirectoryConfigDAO"/>
  	<bean id="taskNotifyDirectoryResourceKeyDAO" class="fr.paris.lutece.plugins.workflow.modules.notifydirectory.business.ResourceKeyDAO"/>

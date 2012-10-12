@@ -51,6 +51,7 @@ public final class NotifyDirectoryConstants
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String USER_AUTO = "auto";
+    public static final String TASK_NOTIFY_DIRECTORY_KEY = "taskNotifyDirectory";
 
     // FIELDS
     public static final String FIELD_NOTIFY = "module.workflow.notifydirectory.task_notify_directory_config.label_notify_by";
