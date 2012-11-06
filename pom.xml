@@ -10,7 +10,7 @@
 	<groupId>fr.paris.lutece.plugins</groupId>
 	<artifactId>module-workflow-notifydirectory</artifactId>
 	<packaging>lutece-plugin</packaging>
-	<version>2.0.4-SNAPSHOT</version>
+	<version>2.0.3-SNAPSHOT</version>
 	<name>Workflow notify directory module</name>
 
 	<repositories>
