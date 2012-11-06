@@ -225,4 +225,12 @@ public interface INotifyDirectoryService
      */
     Map<String, Object> fillModel( TaskNotifyDirectoryConfig config, ResourceHistory resourceHistory, Record record,
         Directory directory, HttpServletRequest request, int nIdAction, int nIdHistory );
+
+    /**
+     * Gets the locale.
+     *
+     * @param request the request
+     * @return the locale
+     */
+    Locale getLocale( HttpServletRequest request );
 }

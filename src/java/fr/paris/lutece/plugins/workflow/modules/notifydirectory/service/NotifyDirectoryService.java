@@ -745,6 +745,26 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
         return model;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Locale getLocale( HttpServletRequest request )
+    {
+        Locale locale = null;
+
+        if ( request != null )
+        {
+            locale = request.getLocale(  );
+        }
+        else
+        {
+            locale = I18nService.getDefaultLocale(  );
+        }
+
+        return locale;
+    }
+
     // PRIVATE METHODS
 
     /**
@@ -894,29 +914,6 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
         }
 
         return strBaseUrl;
-    }
-
-    /**
-     * Get the locale
-     *
-     * @param request
-     *            the HTTP request
-     * @return the locale
-     */
-    private Locale getLocale( HttpServletRequest request )
-    {
-        Locale locale = null;
-
-        if ( request != null )
-        {
-            locale = request.getLocale(  );
-        }
-        else
-        {
-            locale = I18nService.getDefaultLocale(  );
-        }
-
-        return locale;
     }
 
     /**

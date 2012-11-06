@@ -55,6 +55,7 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -99,11 +100,13 @@ public class NotifyDirectoryTaskInfoProvider extends AbstractTaskInfoProvider
     {
         String strTaskResourceInfo = StringUtils.EMPTY;
 
+        Locale locale = _notifyDirectoryService.getLocale( request );
+
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
         TaskNotifyDirectoryConfig config = _taskNotifyDirectoryConfigService.findByPrimaryKey( nIdTask );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Record record = RecordHome.findByPrimaryKey( resourceHistory.getIdResource(  ), pluginDirectory );
-        ITask task = this._taskService.findByPrimaryKey( nIdTask, request.getLocale(  ) );
+        ITask task = _taskService.findByPrimaryKey( nIdTask, locale );
 
         if ( record != null )
         {
@@ -114,8 +117,7 @@ public class NotifyDirectoryTaskInfoProvider extends AbstractTaskInfoProvider
                     request, task.getAction(  ).getId(  ), nIdHistory );
 
             HtmlTemplate t = AppTemplateService.getTemplateFromStringFtl( AppTemplateService.getTemplate( 
-                        TEMPLATE_TASK_NOTIFY_MAIL, request.getLocale(  ), model ).getHtml(  ), request.getLocale(  ),
-                    model );
+                        TEMPLATE_TASK_NOTIFY_MAIL, locale, model ).getHtml(  ), locale, model );
 
             strTaskResourceInfo = t.getHtml(  );
         }
