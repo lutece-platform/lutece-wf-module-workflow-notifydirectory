@@ -576,9 +576,8 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
     {
         Map<String, Object> model = new HashMap<String, Object>(  );
 
-        ITask task = this._taskService.findByPrimaryKey( config.getIdTask(  ), request.getLocale(  ) );
-
         Locale locale = getLocale( request );
+        ITask task = _taskService.findByPrimaryKey( config.getIdTask(  ), locale );
         Plugin pluginDirectory = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 
         model.put( NotifyDirectoryConstants.MARK_MESSAGE, config.getMessage(  ) );
