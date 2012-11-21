@@ -651,12 +651,12 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
             }
         }
 
-        if ( ( record.getDirectory(  ).getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) &&
+        if ( ( directory.getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) &&
                 WorkflowService.getInstance(  ).isAvailable(  ) )
         {
             State state = WorkflowService.getInstance(  )
                                          .getState( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
-                    record.getDirectory(  ).getIdWorkflow(  ), null );
+                    directory.getIdWorkflow(  ), null );
             model.put( NotifyDirectoryConstants.MARK_STATUS, state.getName(  ) );
         }
 
