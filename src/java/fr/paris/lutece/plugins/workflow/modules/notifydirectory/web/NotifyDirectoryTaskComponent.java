@@ -336,8 +336,7 @@ public class NotifyDirectoryTaskComponent extends NoFormTaskComponent
 
         model.put( NotifyDirectoryConstants.MARK_MAILING_LIST, _notifyDirectoryService.getMailingList( request ) );
         model.put( NotifyDirectoryConstants.MARK_PLUGIN_WORKFLOW, pluginWorkflow );
-        model.put( NotifyDirectoryConstants.MARK_TASKS_LIST,
-            _notifyDirectoryService.getListTasks( task.getAction(  ).getId(  ), locale ) );
+        model.put( NotifyDirectoryConstants.MARK_TASKS_LIST, _notifyDirectoryService.getListBelowTasks( task, locale ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFY_DIRECTORY_CONFIG, locale, model );
 

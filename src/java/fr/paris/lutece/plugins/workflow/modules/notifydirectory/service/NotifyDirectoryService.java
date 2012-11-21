@@ -475,19 +475,30 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
      * {@inheritDoc}
      */
     @Override
-    public List<ITask> getListTasks( int nIdAction, Locale locale )
+    public List<ITask> getListBelowTasks( ITask task, Locale locale )
     {
         List<ITask> listTasks = new ArrayList<ITask>(  );
 
-        for ( ITask task : _taskService.getListTaskByIdAction( nIdAction, locale ) )
+        if ( task != null )
         {
-            for ( ITaskInfoProvider provider : TaskInfoManager.getProvidersList(  ) )
+            for ( ITask otherTask : _taskService.getListTaskByIdAction( task.getAction(  ).getId(  ), locale ) )
             {
-                if ( task.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
+                // FIXME : When upgrading to workflow v3.0.2, change this condition to :
+                // if ( task.getOrder(  ) <= otherTasK.getOrder(  ) )
+                // Indeed, in workflow v3.0.1 and inferior, the task are ordered by id task
+                if ( task.getId(  ) == otherTask.getId(  ) )
                 {
-                    listTasks.add( task );
-
                     break;
+                }
+
+                for ( ITaskInfoProvider provider : TaskInfoManager.getProvidersList(  ) )
+                {
+                    if ( otherTask.getTaskType(  ).getKey(  ).equals( provider.getTaskType(  ).getKey(  ) ) )
+                    {
+                        listTasks.add( otherTask );
+
+                        break;
+                    }
                 }
             }
         }
@@ -732,14 +743,11 @@ public final class NotifyDirectoryService implements INotifyDirectoryService
         String strUserGuid = getUserGuid( config, record.getIdRecord(  ), directory.getIdDirectory(  ) );
         fillModelWithUserAttributes( model, strUserGuid );
 
-        if ( !task.getTaskType(  ).getKey(  ).equals( NotifyDirectoryConstants.TASK_NOTIFY_DIRECTORY_KEY ) )
+        // Fill the model with the info of other tasks
+        for ( ITask otherTask : getListBelowTasks( task, locale ) )
         {
-            // Fill the model with the info of other tasks
-            for ( ITask otherTask : getListTasks( nIdAction, locale ) )
-            {
-                model.put( NotifyDirectoryConstants.MARK_TASK + otherTask.getId(  ),
-                    TaskInfoManager.getTaskResourceInfo( nIdHistory, otherTask.getId(  ), request ) );
-            }
+            model.put( NotifyDirectoryConstants.MARK_TASK + otherTask.getId(  ),
+                TaskInfoManager.getTaskResourceInfo( nIdHistory, otherTask.getId(  ), request ) );
         }
 
         return model;

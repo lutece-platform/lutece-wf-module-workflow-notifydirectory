@@ -189,12 +189,25 @@ public interface INotifyDirectoryService
     String getUserGuid( TaskNotifyDirectoryConfig config, int nIdRecord, int nIdDirectory );
 
     /**
-     * Get the list of tasks
-     * @param nIdAction the id action
+     * Get the list of tasks that have an order below the given reference task and that
+     * have a ITaskProvider .
+     * <br />
+     * <b>Example</b> : The list of all tasks that has a provider :
+     * <ul>
+     * <li>Task1</li>
+     * <li>Task2</li>
+     * <li>Task3</li>
+     * </ul>
+     * If the reference task is Task1, the it returns nothing.
+     * <br />
+     * If the reference task is Task2, the it returns only Task1.
+     * <br />
+     * If the reference task is Task3, the it returns [Task1, Task2].
+     * @param task the reference task
      * @param locale the locale
      * @return a list of {@link ITask}
      */
-    List<ITask> getListTasks( int nIdAction, Locale locale );
+    List<ITask> getListBelowTasks( ITask task, Locale locale );
 
     // OTHERS
 
