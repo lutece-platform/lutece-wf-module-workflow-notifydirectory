@@ -7,447 +7,512 @@
 <#assign position_entry_directory_user_guid = -1>
 <#assign id_state_after_validation = -1>
 <#if config?exists>
-	<#assign id_directory = config.idDirectory>
-	<#assign id_mailing_list = config.idMailingList>
-	<#assign position_entry_directory_sms = config.positionEntryDirectorySms>
-	<#assign position_entry_directory_email = config.positionEntryDirectoryEmail>
-	<#assign position_entry_directory_user_guid = config.positionEntryDirectoryUserGuid>
-	<#assign id_state_after_validation = config.idStateAfterValidation>
+<#assign id_directory = config.idDirectory>
+<#assign id_mailing_list = config.idMailingList>
+<#assign position_entry_directory_sms = config.positionEntryDirectorySms>
+<#assign position_entry_directory_email = config.positionEntryDirectoryEmail>
+<#assign position_entry_directory_user_guid = config.positionEntryDirectoryUserGuid>
+<#assign id_state_after_validation = config.idStateAfterValidation>
 </#if>
 
 <#function isSelected entry  default_values >
-	<#if default_values?has_content>
-		<#list default_values as default_value>
-			<#if  default_value=entry>  		
-  				<#return true>
-  			</#if>
-  		</#list>
-	</#if>
- <#return false>
+<#if default_values?has_content>
+<#list default_values as default_value>
+<#if  default_value=entry>  		
+<#return true>
+</#if>
+</#list>
+</#if>
+<#return false>
 </#function>
 
-<h2> #i18n{module.workflow.notifydirectory.task_notify_directory_config.title}</h2>
-<div class="highlight-box">
-	<br />
- 	<p id="notify_by">
-		<label for="notify">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by} * :</label>
-		<input type="radio" name="notify" value="1" 
-			<#if config?exists && config.notifyByEmail && !config.notifyBySms>
-				checked="checked"
-			</#if>
-		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email}	
-		<input type="radio" name="notify" value="2" 
-			<#if config?exists && !config.notifyByEmail && config.notifyBySms>
-				checked="checked"
-			</#if>
-		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sms}
-		<input type="radio" name="notify" value="3" 
-			<#if config?exists && config.notifyByEmail && config.notifyBySms>
-				checked="checked"
-			</#if>
-		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_sms}
-		<input type="radio" name="notify" value="4" 
-			<#if config?exists && !config.notifyByEmail && !config.notifyBySms && config.notifyByMailingList>
-				checked="checked"
-			</#if>
-		/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list}
-	</p>
- 
-	<p>
-	   	<label for="id_directory">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_directory} * :</label>
-		<@combo name="id_directory" items=list_directory default_value=id_directory />
-		<input class="button" type="submit" name="apply" value="#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}"/>
-	</p>
-	<#if mailing_list?exists>
-		<p id="mailing_list">
-			<label for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} * :</label>
-			<@combo name="id_mailing_list"  items=mailing_list default_value=id_mailing_list />
-			<br />
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}
-		</p>
-	</#if>
-	<#if list_entries_email_sms?exists>
-		<p id="entry_sms">
-		    <label for="position_entry_directory_sms">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms} * :</label>
-			<@combo name="position_entry_directory_sms" items=list_entries_email_sms default_value=position_entry_directory_sms />&nbsp;
-			<br/>
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms_comment}
-		 </p>
-	</#if>
-	<#if list_entries_email_sms?exists>
-		<p id="entry_email">
-			<label for="position_entry_directory_email">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email} * :</label>
-			<@combo name="position_entry_directory_email" items=list_entries_email_sms default_value=position_entry_directory_email />&nbsp;
-			<br/>
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email_comment}
-		</p>
-	</#if>
-	<#if list_entries_user_guid?exists && is_user_attribute_ws_active>
-		<p id="notify_by_user_guid">
-			<label for="is_notify_by_user_guid">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by_user_guid} :</label>
-			<input type="checkbox" name="is_notify_by_user_guid" value="1" id="is_notify_by_user_guid"
-				<#if config?exists && config.notifyByEmail && config.notifyByUserGuid>
-					checked="checked"
-				</#if>
-			/>
-			<br />
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by_user_guid_comment}
-		</p>
-		<p id="entry_user_guid">
-			<label for="position_entry_directory_user_guid">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid} :</label>
-			<@combo name="position_entry_directory_user_guid" items=list_entries_user_guid default_value=position_entry_directory_user_guid />&nbsp;
-			<br/>
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid_comment}
-		</p>
-	</#if>
-	<br />
-</div>
-<div class="highlight-box">
-	<br />
-	<p>
-    	<label for="sender_name">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name} * :</label>
-		<#if config?exists && config.senderName?has_content>
-	    	<input type="text" name="sender_name" id="" size="80" value="${config.senderName}" maxlength="255"/>
-	    <#else>
-	    	<input type="text" name="sender_name" id="" size="80" value="${default_sender_name}" maxlength="255"/>
-	    </#if>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name_comment}
-	</p>
-	
-	<p>
-		<label for="recipients_cc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc} :</label>
-		<#if config?exists && config.recipientsCc?has_content>
-	    	<input type="text" name="recipients_cc" id="" size="80" value="${config.recipientsCc}"  maxlength="255"/>
-	    <#else>
-	    	<input type="text" name="recipients_cc" id="" size="80" value="" maxlength="255"/>
-	    </#if>
-	    <br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc_comment}
-	</p>
-	
-	<p>
-		<label for="recipients_bcc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc} :</label>
-		<#if config?exists && config.recipientsBcc?has_content>
-	    	<input type="text" name="recipients_bcc" id="" size="80" value="${config.recipientsBcc}"  maxlength="255"/>
-	    <#else>
-	    	<input type="text" name="recipients_bcc" id="" size="80" value="" maxlength="255"/>
-	    </#if>
-	    <br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc_comment}
-	</p>
+<div class="well">
+    <fieldset>
+        <legend> #i18n{module.workflow.notifydirectory.task_notify_directory_config.title}</legend>
 
-  	<p>
-    	<label for="suject">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject} * :</label>
-	    <#if config?exists && config.subject?has_content>
-	    	<input type="text" name="subject" id="" size="80" value="${config.subject}" maxlength="255"/>
-	    <#else>
-	    	<input type="text" name="subject" id="" size="80" value="" maxlength="255"/>
-	    </#if>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject_comment}
-	</p>
-		
-	<p>
-    	<label for="message">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message} * :</label>
-    	<div class="editor">
-		    <#if config?exists  && config.message?has_content>
-		     	<textarea name="message" id="message" rows="20" cols="90" class="richtext">${config.message}</textarea>
-		    <#else>
-		    	<textarea name="message" id="message" rows="20" cols="90" class="richtext"></textarea>
-		    </#if>
-		</div>
-		<br/>
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_comment}
-	</p>
-	<br />
-	<#if config?exists && config.idDirectory!=-1>
-		<p>
-			<label for="view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record} :</label>
-			<input type="checkbox" name="view_record" id="view_record" value="1" 
-				<#if config.viewRecord>
-					checked="checked"
-				</#if>	
-			/>
-		    <br/>
-		    <label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record_comment}
-		</p>
-		<div id="record">
-			<p>
-				<label>&nbsp;</label>
-				#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker_link_view_record}
-			</p>
-			<p>
-		    	<label for="label_link_view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link_view_record} * :</label>
-		    	<#if config.labelLinkViewRecord?has_content>
-	     			<input type="text" name="label_link_view_record" id="" size="80" value="${config.labelLinkViewRecord}"  maxlength="255"/>
-		     	<#else>
-	     			<input type="text" name="label_link_view_record" id="" size="80" value=""  maxlength="255"/>
-		     	</#if>		
-			   	<br/>
-				<label>&nbsp;</label>
-				#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_view_record_comment}
-			</p>
-		</div>
-		<br />
-		<br />
-		<fieldset>
-			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_comment}</legend>
-			<table>
-				<tr>
-					<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory}</th>
-					<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_status}</td>
-					<td>&#36;&#123;status&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_title}</td>
-					<td>&#36;&#123;directory_title&#125;</td>
-				</tr>
-				<tr>
-					<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_description}</td>
-					<td>&#36;&#123;directory_description&#125;</td>
-				</tr>
-			</table>
-		</fieldset>
-		<br />
-		<#if is_user_attribute_ws_active>
-			<fieldset class="user_attribute_freemarker">
-				<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_user_attribute_comment}</legend>
-				<table>
-					<tr>
-						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_user_attribute}</th>
-						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
-					</tr>
-					<tr>
-						<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_first_name}</td>
-						<td>&#36;&#123;first_name&#125;</td>
-					</tr>
-					<tr>
-						<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_last_name}</td>
-						<td>&#36;&#123;last_name&#125;</td>
-					</tr>
-					<tr>
-						<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email}</td>
-						<td>&#36;&#123;email&#125;</td>
-					</tr>
-					<tr>
-						<td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_phone_number}</td>
-						<td>&#36;&#123;phone_number&#125;</td>
-					</tr>
-				</table>
-			</fieldset>
-			<br />
-		</#if>
-		<#if tasks_list?exists && tasks_list?has_content>
-			<fieldset>
-				<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_tasks_list_comment}</legend>
-				<table>
-					<tr>
-						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_title}</th>
-						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_type}</th>
-						<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
-					</tr>
-					<#list tasks_list as task>
-						<tr>
-							<td>${task.getTitle( locale )}</td>
-							<td>${task.taskType.title}</td>
-							<td>&#36;&#123;task_${task.id}&#125;</td>
-						</tr>
-					</#list>
-				</table>
-			</fieldset>
-			<br />
-		</#if>
-		<fieldset>
-			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_directory_comment}</legend>
-			<table>
-		  		<tr>
-		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry}</th>
-		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
-		  		</tr>
-			 	<#list list_entries_freemarker as entry>
-				  	<tr>
-				  		<td>
-				  			${entry.title}
-				  		</td>
-				  		<td>
-				  			&#36;&#123;position_${entry.position}&#125;
-				  		</td>
-				  	</tr>
-				  </#list>
-			</table>
-		</fieldset>
-	    <fieldset>
-			<legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_file}</legend>
-			<table>
-		  		<tr>
-		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_checked}</th>
-		  			<th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_name}</th>
-		  		</tr>
-			 	<#list list_entries_file as entry>
-				  	<tr>
-				  		<td>
-				  			<input type="checkbox" id="list_position_entry_file_checked" name="list_position_entry_file_checked" value="${entry.position}"
-				  				<#if ( list_position_entry_file_checked?has_content && isSelected (entry.position,list_position_entry_file_checked))>
-									checked="checked" 
-								</#if>
-				  			 />
-				  		</td>
-				  		<td>
-				  			${entry.title}
-				  		</td>
-				  		
-				  	</tr>
-				  </#list>
-			</table>
-		</fieldset>
-		<br />
-	</#if>
+        <div id="notify_by">
+            <div class="control-group">
+                <label class="control-label" for="notify">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by} * :</label>
+                <div class="controls">
+                    <input type="radio" name="notify" value="1" 
+                           <#if config?exists && config.notifyByEmail && !config.notifyBySms>
+                           checked="checked"
+                           </#if>
+                           />
+                           &nbsp #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email}
+                </div>
+
+                <div class="controls">
+                    <input type="radio" name="notify" value="2" 
+                           <#if config?exists && !config.notifyByEmail && config.notifyBySms>
+                           checked="checked"
+                           </#if>
+                           />
+                           &nbsp #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sms}
+                </div>
+
+                <div class="controls">
+                    <input type="radio" name="notify" value="3" 
+                           <#if config?exists && config.notifyByEmail && config.notifyBySms>
+                           checked="checked"
+                           </#if>
+                           />
+                           &nbsp; #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_sms}
+                </div>
+                <div class="controls">
+                    <input type="radio" name="notify" value="4" 
+                           <#if config?exists && !config.notifyByEmail && !config.notifyBySms && config.notifyByMailingList>
+                           checked="checked"
+                           </#if>
+                           /> 
+                           &nbsp; #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label" for="id_directory">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_directory} * :</label>
+            <div class="controls">
+                <@combo name="id_directory" items=list_directory default_value=id_directory />
+                <span class="help-block"></span>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-small" type="submit" name="apply" >#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}</button>
+
+        <#if mailing_list?exists>
+        <div id="mailing_list">
+            <div class="control-group">
+                <label class="control-label" for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} * :</label>
+                <div class="controls">
+                    <@combo name="id_mailing_list"  items=mailing_list default_value=id_mailing_list />
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}</span>
+                </div>
+            </div>
+        </div>        
+        </#if>
+
+        <#if list_entries_email_sms?exists>
+        <div id="entry_sms">
+            <div class="control-group">
+                <label class="control-label" for="position_entry_directory_sms">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms} * :</label>
+                <div class="controls">
+                    <@combo name="position_entry_directory_sms" items=list_entries_email_sms default_value=position_entry_directory_sms />
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_sms_comment}</span>
+                </div>
+            </div>
+        </div>
+        </#if>
+
+        <#if list_entries_email_sms?exists>
+        <div id="entry_email">
+            <div class="control-group">
+                <label class="control-label" for="position_entry_directory_email">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email} * :</label>
+                <div class="controls">
+                    <@combo name="position_entry_directory_email" items=list_entries_email_sms default_value=position_entry_directory_email />
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_email_comment}</span>
+                </div>
+            </div>
+        </div>
+        </#if>
+
+        <#if list_entries_user_guid?exists && is_user_attribute_ws_active>
+        <div id="notify_by_user_guid">
+            <div class="control-group">
+                <label class="control-label" for="is_notify_by_user_guid">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by_user_guid} :</label>
+                <div class="controls">
+                    <input type="checkbox" name="is_notify_by_user_guid" value="1" id="is_notify_by_user_guid"
+                           <#if config?exists && config.notifyByEmail && config.notifyByUserGuid>
+                           checked="checked"
+                           </#if>
+                           />
+                           <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_notify_by_user_guid_comment}</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="entry_user_guid">
+            <div class="control-group">
+                <label class="control-label" for="position_entry_directory_user_guid">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid} :</label>
+                <div class="controls">
+                    <@combo name="position_entry_directory_user_guid" items=list_entries_user_guid default_value=position_entry_directory_user_guid />
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_entry_directory_user_guid_comment}</span>
+                </div>
+            </div>
+        </div>
+        </#if>
+
+
+        <div class="well">
+
+            <div class="control-group">
+                <label class="control-label" for="sender_name">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name} * :</label>
+                <div class="controls">
+                    <#if config?exists && config.senderName?has_content>
+                    <input type="text" name="sender_name" id="" size="80" value="${config.senderName}" maxlength="255"/>
+                    <#else>
+                    <input type="text" name="sender_name" id="" size="80" value="${default_sender_name}" maxlength="255"/>
+
+                    </#if>
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_sender_name_comment}</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="recipients_cc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc} :</label>
+                <div class="controls">
+                    <#if config?exists && config.recipientsCc?has_content>
+                    <input type="text" name="recipients_cc" id="" size="80" value="${config.recipientsCc}"  maxlength="255"/>
+                    <#else>
+                    <input type="text" name="recipients_cc" id="" size="80" value="" maxlength="255"/>
+                    </#if>
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_cc_comment}</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="recipients_bcc">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc} :</label>
+                <div class="controls">
+                    <#if config?exists && config.recipientsBcc?has_content>
+                    <input type="text" name="recipients_bcc" id="" size="80" value="${config.recipientsBcc}"  maxlength="255"/>
+                    <#else>
+                    <input type="text" name="recipients_bcc" id="" size="80" value="" maxlength="255"/>
+                    </#if>
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_recipients_bcc_comment}</span>
+                </div>
+            </div>
+
+
+            <div class="control-group">
+                <label class="control-label" for="suject">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject} * :</label>
+                <div class="controls">
+                    <#if config?exists && config.subject?has_content>
+                    <input type="text" name="subject" id="" size="80" value="${config.subject}" maxlength="255"/>
+                    <#else>
+                    <input type="text" name="subject" id="" size="80" value="" maxlength="255"/>
+                    </#if>
+                    <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_subject_comment}</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="message">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message} * :</label>
+                <div class="editor">
+                    <div class="controls">
+                        <#if config?exists  && config.message?has_content>
+                        <textarea name="message" id="message" rows="20" cols="90" class="richtext">${config.message}</textarea>
+                        <#else>
+                        <textarea name="message" id="message" rows="20" cols="90" class="richtext"></textarea>
+                        </#if>
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_comment}</span>
+                    </div>
+                </div>
+            </div>
+
+            <#if config?exists && config.idDirectory!=-1>
+
+            <div class="control-group">
+                <label class="control-label" for="view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record} :</label>
+                <div class="controls">
+                    <input type="checkbox" name="view_record" id="view_record" value="1" 
+                           <#if config.viewRecord>
+                           checked="checked"
+                           </#if>	
+                           />
+                           <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_view_record_comment}</span>
+                </div>
+            </div>
+
+            <div id="record">
+
+                <div class="control-group">
+                    <div class="controls">
+                        #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker_link_view_record}
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="label_link_view_record">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link_view_record} * :</label>
+                    <div class="controls">
+                        <#if config.labelLinkViewRecord?has_content>
+                        <input type="text" name="label_link_view_record" id="" size="80" value="${config.labelLinkViewRecord}"  maxlength="255"/>
+                        <#else>
+                        <input type="text" name="label_link_view_record" id="" size="80" value=""  maxlength="255"/>
+                        </#if>		
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_view_record_comment}</span>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <br />
+            <fieldset>
+                <legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_comment}</legend>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_status}</td>
+                        <td>&#36;&#123;status&#125;</td>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_title}</td>
+                        <td>&#36;&#123;directory_title&#125;</td>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_directory_description}</td>
+                        <td>&#36;&#123;directory_description&#125;</td>
+                    </tr>
+                </table>
+            </fieldset>
+            <br />
+            <#if is_user_attribute_ws_active>
+            <fieldset class="user_attribute_freemarker">
+
+                <legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_user_attribute_comment}</legend>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_user_attribute}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_first_name}</td>
+                        <td>&#36;&#123;first_name&#125;</td>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_last_name}</td>
+                        <td>&#36;&#123;last_name&#125;</td>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email}</td>
+                        <td>&#36;&#123;email&#125;</td>
+                    </tr>
+                    <tr>
+                        <td>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_phone_number}</td>
+                        <td>&#36;&#123;phone_number&#125;</td>
+                    </tr>
+                </table>
+            </fieldset>
+            <br />
+            </#if>
+            <#if tasks_list?exists && tasks_list?has_content>
+            <fieldset>
+
+                <legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_tasks_list_comment}</legend>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_title}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_type}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
+                    </tr>
+                    <#list tasks_list as task>
+                    <tr>
+                        <td>${task.getTitle( locale )}</td>
+                        <td>${task.taskType.title}</td>
+                        <td>&#36;&#123;task_${task.id}&#125;</td>
+                    </tr>
+                    </#list>
+                </table>
+            </fieldset>
+            <br />
+            </#if>
+            <fieldset>
+                <legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_directory_comment}</legend>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker}</th>
+                    </tr>
+                    <#list list_entries_freemarker as entry>
+                    <tr>
+                        <td>
+                            ${entry.title}
+                        </td>
+                        <td>
+                            &#36;&#123;position_${entry.position}&#125;
+                        </td>
+                    </tr>
+                    </#list>
+                </table>
+            </fieldset>
+
+            <fieldset>
+                <legend>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_entry_file}</legend>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_checked}</th>
+                        <th>#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_file_name}</th>
+                    </tr>
+                    <#list list_entries_file as entry>
+                    <tr>
+                        <td>
+                            <input type="checkbox" id="list_position_entry_file_checked" name="list_position_entry_file_checked" value="${entry.position}"
+                                   <#if ( list_position_entry_file_checked?has_content && isSelected (entry.position,list_position_entry_file_checked))>
+                                   checked="checked" 
+                                   </#if>
+                                   />
+                        </td>
+                        <td>
+                            ${entry.title}
+                        </td>
+
+                    </tr>
+                    </#list>
+                </table>
+            </fieldset>
+            <br />
+            </#if>
+        </div>
+        
+        
+        <div class="well">
+
+            <div class="control-group">
+                <label class="control-label" for="email_validation">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_validation} :</label>
+                <div class="controls">
+                    <input type="checkbox" name="email_validation" id="email_validation" value="1" 
+                           <#if config?exists && config.emailValidation>
+                           checked="checked"
+                           </#if>	
+                           />
+                           <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_validation_comment}</span>
+                </div>
+            </div>
+
+            <div id="email">
+                <div class="control-group">
+                    <div class="controls">
+                        #i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker_link}
+                    </div>
+
+
+                    <label class="control-label" for="label_link">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link} * :</label>
+                    <div class="controls">
+                        <#if config?exists && config.labelLink?has_content>
+                        <input type="text" name="label_link" id="" size="80" value="${config.labelLink}"  maxlength="255"/>
+                        <#else>
+                        <input type="text" name="label_link" id="" size="80" value=""  maxlength="255"/>
+                        </#if>		
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link_comment}</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="id_state">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state} * :</label>
+                    <div class="controls">
+                        <@combo name="id_state"  items=list_state default_value=id_state_after_validation />
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state_comment}</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="message_validation">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation} * :</label>
+                    <div class="controls">
+                        <#if config?exists && config.messageValidation?has_content>
+                        <textarea name="message_validation" id="message_validation" rows="20" cols="90">${config.messageValidation}</textarea>
+                        <#else>
+                        <textarea name="message_validation" id="message_validation" rows="20" cols="90"></textarea>
+                        </#if>
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation_comment}</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="period_validity">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity} * :</label>
+                    <div class="controls">
+                        <#if config?exists && config.periodValidity!=-1>
+                        <input type="text" name="period_validity" id="" size="2" value="${config.periodValidity}"  maxlength="2"/>
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_unit}</span>
+                        <#else>
+                        <input type="text" name="period_validity" id="" size="2" value="" maxlength="2"/>
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_unit}</span>
+                        </#if>
+                        <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_comment}</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </fieldset>
 </div>
-<div class="highlight-box">
-	<p>
-		<label for="email_validation">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_validation} :</label>
-		<input type="checkbox" name="email_validation" id="email_validation" value="1" 
-			<#if config?exists && config.emailValidation>
-				checked="checked"
-			</#if>	
-		/>
-	    <br/>
-	    <label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_email_validation_comment}
-	</p>
-	<div id="email">
-		<label>&nbsp;</label>
-		#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_freemarker_link}
-		<p>
-	    	<label for="label_link">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link} * :</label>
-	    	<#if config?exists && config.labelLink?has_content>
-     			<input type="text" name="label_link" id="" size="80" value="${config.labelLink}"  maxlength="255"/>
-	     	<#else>
-     			<input type="text" name="label_link" id="" size="80" value=""  maxlength="255"/>
-	     	</#if>		
-		   	<br/>
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_label_link_comment}
-		</p>
-		<p>
-			<label for="id_state">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state} * :</label>
-			<@combo name="id_state"  items=list_state default_value=id_state_after_validation />
-			<br/><label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_state_comment}
-		</p>
-		<p>
-			<label for="message_validation">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation} * :</label>
-	    	<#if config?exists && config.messageValidation?has_content>
-	     		<textarea name="message_validation" id="message_validation" rows="20" cols="90">${config.messageValidation}</textarea>
-	     	<#else>
-	     		<textarea name="message_validation" id="message_validation" rows="20" cols="90"></textarea>
-	     	</#if>
-		   	<br/>
-		  	<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation_comment}
-		</p>
-		<p>
-	    	<label for="period_validity">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity} * :</label>
-	    	<#if config?exists && config.periodValidity!=-1>
-				<input type="text" name="period_validity" id="" size="2" value="${config.periodValidity}"  maxlength="2"/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_unit}
-	     	<#else>
-	     		<input type="text" name="period_validity" id="" size="2" value="" maxlength="2"/>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_unit}
-	     	</#if>		
-			<br/>
-			<label>&nbsp;</label>
-			#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_comment}
-		</p>
-	</div>
-</div>
+
+
+
 <@initEditor />
 <script type="text/javascript">
-$( document ).ready( function(  ) {
-	// Init
-	if ( $( '#entry_user_guid select' ).val(  ) == "-1" ) {
-		$( '.user_attribute_freemarker' ).hide(  );
-	};
-	if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '2' ) {
-		// SMS
-		$( '#entry_email' ).hide(  );
-		$( '#notify_by_user_guid' ).hide(  );
-		$( '#mailing_list' ).hide(  );
-	} else if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '4' ) {
-		// MAILING LIST
-		$( '#entry_sms' ).hide(  ); 
-		$( '#entry_email' ).hide(  );
-		$( '#notify_by_user_guid' ).hide(  );
-	} else {
-		if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '1' ) {
-			// EMAIL
-			$( '#entry_sms' ).hide(  ); 
-		}
-		// SMS + EMAIL
-		if ( $( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
-			$( '#entry_email' ).hide(  );
-		}
-		$( '#mailing_list' ).hide(  );
-	}
-	if ( !$( '#view_record' ).is( ':checked' ) ) {
-		$( '#record' ).hide(  );
-	}
-	if ( !$( '#email_validation' ).is( ':checked' ) ) {
-		$( '#email' ).hide(  );
-	}
+    $( document ).ready( function(  ) {
+        // Init
+        if ( $( '#entry_user_guid select' ).val(  ) == "-1" ) {
+            $( '.user_attribute_freemarker' ).hide(  );
+        };
+        if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '2' ) {
+            // SMS
+            $( '#entry_email' ).hide(  );
+            $( '#notify_by_user_guid' ).hide(  );
+            $( '#mailing_list' ).hide(  );
+        } else if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '4' ) {
+            // MAILING LIST
+            $( '#entry_sms' ).hide(  ); 
+            $( '#entry_email' ).hide(  );
+            $( '#notify_by_user_guid' ).hide(  );
+        } else {
+            if ( $( '#notify_by input[type="radio"]:checked' ).val(  ) == '1' ) {
+                // EMAIL
+                $( '#entry_sms' ).hide(  ); 
+            }
+            // SMS + EMAIL
+            if ( $( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
+                $( '#entry_email' ).hide(  );
+            }
+            $( '#mailing_list' ).hide(  );
+        }
+        if ( !$( '#view_record' ).is( ':checked' ) ) {
+            $( '#record' ).hide(  );
+        }
+        if ( !$( '#email_validation' ).is( ':checked' ) ) {
+            $( '#email' ).hide(  );
+        }
 
-	// Functions
-	$( '#notify_by input[type="radio"]' ).click( function(  ) {
-		if ( $( this ).val(  ) == '1' ) {
-			$( '#entry_sms' ).hide(  );
-			$( '#notify_by_user_guid' ).show(  );
-			if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
-				$( '#entry_email' ).show(  );
-			}
-			$( '#mailing_list' ).hide(  );
-		} else if ( $( this ).val(  ) == '2' ) {
-			$( '#entry_sms' ).show(  );
-			$( '#notify_by_user_guid' ).hide(  );
-			$( '#entry_email' ).hide(  );
-			$( '#mailing_list' ).hide(  );
-		} else if ( $( this ).val(  ) == '3' ) {
-			$( '#entry_sms' ).show(  );
-			$( '#notify_by_user_guid' ).show(  );
-			if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
-				$( '#entry_email' ).show(  );
-			}
-			$( '#entry_mailing_list' ).hide(  );
-		} else if ( $( this ).val(  ) == '4' ) {
-			$( '#entry_sms' ).hide(  );
-			$( '#notify_by_user_guid' ).hide(  );
-			$( '#entry_email' ).hide(  );
-			$( '#mailing_list' ).show(  );
-		}
-	} );
-	$( '#entry_user_guid select' ).change( function(  ) {
-		$( '.user_attribute_freemarker' ).toggle( $( this ).val(  ) != '-1' );
-	} );
-	$( '#is_notify_by_user_guid' ).click( function(  ) {
-		$( '#entry_email' ).toggle( !$( this ).is( ':checked' ) );
-	} );
-	$( '#view_record' ).click( function(  ) {
-		$( '#record' ).toggle(  $( this ).is( ':checked' ) );
-	} );
-	$( '#email_validation' ).click( function(  ) {
-		$( '#email' ).toggle(  $( this ).is( ':checked' ) );
-	} );
-} );
+        // Functions
+        $( '#notify_by input[type="radio"]' ).click( function(  ) {
+            if ( $( this ).val(  ) == '1' ) {
+                $( '#entry_sms' ).hide(  );
+                $( '#notify_by_user_guid' ).show(  );
+                if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
+                    $( '#entry_email' ).show(  );
+                }
+                $( '#mailing_list' ).hide(  );
+            } else if ( $( this ).val(  ) == '2' ) {
+                $( '#entry_sms' ).show(  );
+                $( '#notify_by_user_guid' ).hide(  );
+                $( '#entry_email' ).hide(  );
+                $( '#mailing_list' ).hide(  );
+            } else if ( $( this ).val(  ) == '3' ) {
+                $( '#entry_sms' ).show(  );
+                $( '#notify_by_user_guid' ).show(  );
+                if ( !$( '#is_notify_by_user_guid' ).is( ':checked' ) ) {
+                    $( '#entry_email' ).show(  );
+                }
+                $( '#entry_mailing_list' ).hide(  );
+            } else if ( $( this ).val(  ) == '4' ) {
+                $( '#entry_sms' ).hide(  );
+                $( '#notify_by_user_guid' ).hide(  );
+                $( '#entry_email' ).hide(  );
+                $( '#mailing_list' ).show(  );
+            }
+        } );
+        $( '#entry_user_guid select' ).change( function(  ) {
+            $( '.user_attribute_freemarker' ).toggle( $( this ).val(  ) != '-1' );
+        } );
+        $( '#is_notify_by_user_guid' ).click( function(  ) {
+            $( '#entry_email' ).toggle( !$( this ).is( ':checked' ) );
+        } );
+        $( '#view_record' ).click( function(  ) {
+            $( '#record' ).toggle(  $( this ).is( ':checked' ) );
+        } );
+        $( '#email_validation' ).click( function(  ) {
+            $( '#email' ).toggle(  $( this ).is( ':checked' ) );
+        } );
+    } );
 </script>
