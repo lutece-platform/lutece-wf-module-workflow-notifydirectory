@@ -352,9 +352,9 @@
                     <label class="control-label" for="message_validation">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation} * </label>
                     <div class="controls">
                         <#if config?exists && config.messageValidation?has_content>
-                        <textarea name="message_validation" id="message_validation" rows="20" cols="90">${config.messageValidation}</textarea>
+                        <textarea name="message_validation" id="message_validation" rows="20" style="width:50%;">${config.messageValidation}</textarea>
                         <#else>
-                        <textarea name="message_validation" id="message_validation" rows="20" cols="90"></textarea>
+                        <textarea name="message_validation" id="message_validation" rows="20" style="width:50%;"></textarea>
                         </#if>
                         <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_message_validation_comment}</span>
                     </div>
