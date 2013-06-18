@@ -59,8 +59,11 @@
             <label class="control-label" for="id_directory">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_task_directory} *</label>
             <div class="controls">
             <@comboWithParams name="id_directory" default_value=id_directory?string additionalParameters="class=\"input-xxlarge\"" items=list_directory />
-		
-            </div>
+			<button class="btn btn-primary btn-small" type="submit" value="apply" name="apply" title="#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}">
+				<!-- Value in button to fix bad behaviour on button click -->
+				<i class="icon-ok icon-white"></i>
+			</button>
+			</div>
         </div>
         <#if mailing_list?exists>
         <div id="mailing_list">
@@ -373,11 +376,7 @@
                         <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_period_validity_comment}</span>
                     </div>
                 </div>
-				<div class="form-actions">
-					<button class="btn btn-primary btn-small" type="submit" name="apply" >
-						<i class="icon-ok icon-white"></i>&nbsp;#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_apply}
-					</button>
-				</div>
+				
             </div>
 </fieldset>
 
