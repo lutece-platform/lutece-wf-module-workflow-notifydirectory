@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS task_notify_directory_ef;
 DROP TABLE IF EXISTS task_notify_directory_cf;
 DROP TABLE IF EXISTS task_notify_directory_key;
 
@@ -14,11 +15,11 @@ CREATE TABLE task_notify_directory_cf(
   sender_name VARCHAR(255) DEFAULT NULL, 
   subject VARCHAR(255) DEFAULT NULL, 
   message long VARCHAR DEFAULT NULL,
-  is_notify_by_email SMALLINT(6) NOT NULL DEFAULT 0,
-  is_notify_by_sms SMALLINT(6) NOT NULL DEFAULT 0,
-  is_notify_by_mailing_list SMALLINT(6) NOT NULL DEFAULT 0,
-  is_notify_by_user_guid SMALLINT(6) NOT NULL DEFAULT 0,
-  is_email_validation SMALLINT(6) NOT NULL DEFAULT 0,
+  is_notify_by_email SMALLINT NOT NULL DEFAULT 0,
+  is_notify_by_sms SMALLINT NOT NULL DEFAULT 0,
+  is_notify_by_mailing_list SMALLINT NOT NULL DEFAULT 0,
+  is_notify_by_user_guid SMALLINT NOT NULL DEFAULT 0,
+  is_email_validation SMALLINT NOT NULL DEFAULT 0,
   id_state_after_validation INT DEFAULT NULL,
   label_link VARCHAR(255) DEFAULT NULL, 
   message_validation long varchar DEFAULT NULL,
@@ -26,7 +27,7 @@ CREATE TABLE task_notify_directory_cf(
   recipients_cc VARCHAR(255) DEFAULT '' NOT NULL,
   recipients_bcc VARCHAR(255) DEFAULT '' NOT NULL,
   id_mailing_list INT DEFAULT NULL,
-  is_view_record SMALLINT(6) NOT NULL DEFAULT 0,
+  is_view_record SMALLINT NOT NULL DEFAULT 0,
   label_link_view_record VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY  (id_task)
   );
