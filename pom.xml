@@ -11,7 +11,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-workflow-notifydirectory</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.1</version>
     <name>Lutece workflow notify directory module</name>
 
     <repositories>
@@ -48,6 +48,7 @@
         <connection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-notifydirectory.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-notifydirectory.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-wf-module-workflow-notifydirectory.git</url>
-    </scm>
+      <tag>lutece-wf-module-workflow-notifydirectory-4.0.1</tag>
+  </scm>
     
 </project>
