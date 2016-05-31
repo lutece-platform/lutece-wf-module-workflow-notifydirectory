@@ -2,7 +2,7 @@
     <!-- Plugin Informations -->
     <name>workflow-notifydirectory</name>
     <class>fr.paris.lutece.plugins.workflow.modules.notifydirectory.service.NotifyDirectoryPlugin</class>
-    <version>4.0.2</version>
+    <version>4.0.3-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
