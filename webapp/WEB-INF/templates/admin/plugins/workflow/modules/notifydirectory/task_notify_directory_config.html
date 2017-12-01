@@ -74,7 +74,7 @@
             <div class="form-group">
                 <label class="control-label col-xs-12 col-sm-12 col-md-3 col-lg-3" for="id_mailing_list">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list} *</label>
                 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                    <@comboWithParams name="id_mailing_list" items=mailing_list default_value="id_mailing_list" additionalParameters="class='form-control input-sm'" />
+                    <@comboWithParams name="id_mailing_list" items=mailing_list default_value="${config.idMailingList!}" additionalParameters="class='form-control input-sm'" />
                     <span class="help-block">#i18n{module.workflow.notifydirectory.task_notify_directory_config.label_mailing_list_comment}</span>
                 </div>
             </div>
